@@ -1,407 +1,386 @@
-import React, { useState } from 'react';
-import { Play, Download, Share2, X, ChevronLeft, ChevronRight } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Đích Ưu Đãi Trang Sức</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải thư viện Icon Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Các hiệu ứng chuyển động tuỳ chỉnh thay thế cho thư viện react-animate */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(1.5rem); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideRightFade { from { opacity: 0; transform: translateX(1.5rem); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes zoomInFade { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
-// Component Popup hiển thị đè lên ảnh (Liquid Glassmorphism + Image Carousel)
-const OverlapPopup = ({ product, position = 'center', onClose }) => {
-  const posClass = position === 'center' ? 'left-1/2 -translate-x-1/2' : 'left-5';
-  const [currentImg, setCurrentImg] = useState(0);
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .animate-slide-up { animation: slideUpFade 0.7s ease-out forwards; }
+        .animate-slide-right { animation: slideRightFade 0.7s ease-out forwards; }
+        .animate-zoom-in { animation: zoomInFade 0.3s ease-out forwards; }
 
-  const nextImg = (e) => {
-    e.stopPropagation();
-    setCurrentImg((prev) => (prev === product.images.length - 1 ? 0 : prev + 1));
-  };
+        /* Ẩn thanh cuộn ngang */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-[#fbfbfd] selection:bg-[#0ABBCE] selection:text-white antialiased">
+    <!-- Nơi render toàn bộ giao diện -->
+    <div id="app"></div>
 
-  const prevImg = (e) => {
-    e.stopPropagation();
-    setCurrentImg((prev) => (prev === 0 ? product.images.length - 1 : prev - 1));
-  };
+    <script>
+        // --- DỮ LIỆU SẢN PHẨM & TRẠNG THÁI ---
+        const mockImages = [
+            "https://images.unsplash.com/photo-1599643478514-4a4e03152d5b?auto=format&fit=crop&q=80&w=400",
+            "https://images.unsplash.com/photo-1605100804763-247f661204d8?auto=format&fit=crop&q=80&w=400",
+            "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=400",
+            "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=400"
+        ];
 
-  return (
-    <div className={`absolute -bottom-20 ${posClass} w-[250px] h-[310px] bg-gradient-to-br from-white/70 to-white/30 backdrop-blur-xl backdrop-saturate-150 shadow-[0_12px_40px_rgba(0,0,0,0.12)] rounded-t-3xl rounded-b-2xl flex flex-col p-3 border border-white/80 z-40 animate-in fade-in zoom-in-95 duration-300`}>
-      {/* Nút đóng */}
-      <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="absolute top-3 right-3 bg-white/50 backdrop-blur-md p-1.5 rounded-full text-[#1d1d1f] hover:bg-white/80 shadow-sm z-20 transition-colors border border-white/50">
-        <X className="w-3.5 h-3.5"/>
-      </button>
-      
-      {/* Nội dung sản phẩm */}
-      <div className="flex-1 flex flex-col w-full h-full relative">
-        <h3 className="font-semibold text-[15px] text-[#1d1d1f] pr-8 leading-tight font-sans tracking-wide truncate">{product.name}</h3>
-        <p className="text-[#0ABBCE] font-medium text-xs mb-2 mt-1">{product.price}</p>
+        const productDB = {
+            "nhan_kim_cuong": { name: "Nhẫn Kim Cương", price: "5.500.000đ", images: [ "https://images.unsplash.com/photo-1605100804763-247f661204d8?auto=format&fit=crop&q=80&w=400", ...mockImages.slice(0, 3) ] },
+            "lac_tay_sang_trong": { name: "Lắc Tay Sang Trọng", price: "4.750.000đ", images: [ "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=400", ...mockImages.slice(0, 3) ] },
+            "day_chuyen_vang": { name: "Dây Chuyền Vàng", price: "8.200.000đ", images: [ "https://images.unsplash.com/photo-1599643478514-4a4e03152d5b?auto=format&fit=crop&q=80&w=400", ...mockImages.slice(0, 3) ] },
+            "bong_tai_bac": { name: "Bông Tai Bạc", price: "3.300.000đ", images: [ "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=400", ...mockImages.slice(0, 3) ] },
+            "khuyen_tai_bach_kim": { name: "Khuyên Tai Bạch Kim", price: "150.000đ", images: mockImages },
+            "vong_tay_hoa_hong": { name: "Vòng Tay Hoa Hồng", price: "250.000đ", images: mockImages },
+            "mat_day_chuyen_sapphire": { name: "Mặt Dây Chuyền Sapphire", price: "350.000đ", images: mockImages },
+            "day_chuyen_mat_hoa": { name: "Dây Chuyền Mặt Hoa", price: "8.200.000đ", images: mockImages },
+            "vong_tay_hoa_hong_2": { name: "Vòng Tay Hoa Hồng", price: "6.800.000đ", images: mockImages },
+            "nhan_hoa_xa_cu": { name: "Nhẫn Hoa Xà Cừ", price: "4.500.000đ", images: mockImages },
+            "bong_tai_cao_cap": { name: "Bông Tai Cao Cấp", price: "1.200.000đ", images: mockImages },
+            "nhan_dinh_hon": { name: "Nhẫn Đính Hôn", price: "900.000đ", images: mockImages }
+        };
+
+        const state = {
+            activeBranch: 'PNJ',
+            activePopup: null,
+            popupImageIdx: 0
+        };
+
+        const branches = ['PNJ', 'STYLE By PNJ', 'Disney|PNJ', 'MANCODE by PNJ'];
         
-        {/* Khung Carousel Full Image */}
-        <div className="relative flex-1 w-full rounded-2xl overflow-hidden bg-black/5 group shadow-inner">
-          {/* Lớp hiển thị ảnh với hiệu ứng fade */}
-          <img 
-            key={currentImg}
-            src={product.images[currentImg]}
-            alt={`${product.name} - ${currentImg + 1}`}
-            className="absolute inset-0 w-full h-full object-cover animate-in fade-in duration-500"
-          />
+        const layoutMap = {
+            'PNJ': [1, 5, 3, 6, 4, 1],
+            'STYLE By PNJ': [6, 1, 5, 4, 3, 5],
+            'Disney|PNJ': [3, 6, 1, 5, 4, 1],
+            'MANCODE by PNJ': [5, 4, 6, 3, 1, 5],
+        };
 
-          {/* Nút điều hướng (Chỉ hiện khi hover) */}
-          <div className="absolute inset-0 flex items-center justify-between px-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button onClick={prevImg} className="p-1 bg-white/40 backdrop-blur-md rounded-full text-[#1d1d1f] hover:bg-white/70 transition-colors">
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button onClick={nextImg} className="p-1 bg-white/40 backdrop-blur-md rounded-full text-[#1d1d1f] hover:bg-white/70 transition-colors">
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Dấu chấm điều hướng (Pagination Dots) */}
-          <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-            {product.images.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={(e) => { e.stopPropagation(); setCurrentImg(idx); }}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  currentImg === idx ? 'bg-[#0ABBCE] w-4' : 'bg-[#1d1d1f]/20 hover:bg-[#1d1d1f]/40 w-1.5'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Nút Mua Ngay */}
-      <button 
-        onClick={() => alert(`Đang chuyển hướng đến trang Mua Hàng của: ${product.name}`)}
-        className="w-full mt-3 bg-white/60 backdrop-blur-md border border-white text-[#0ABBCE] py-2.5 rounded-xl font-semibold text-xs tracking-widest hover:bg-[#0ABBCE] hover:text-white hover:border-[#0ABBCE] hover:shadow-[0_4px_14px_rgba(10,187,206,0.39)] transition-all duration-300 shrink-0 uppercase"
-      >
-        MUA NGAY
-      </button>
-    </div>
-  );
-};
-
-// Component chấm tròn hiển thị sản phẩm (Tiffany Blue Hotspot)
-const ProductPoint = ({ top, left, right, bottom, transform, product, groupId, onClick }) => (
-  <button
-    onClick={(e) => { e.stopPropagation(); onClick({ ...product, groupId }); }}
-    className={`absolute w-7 h-7 bg-white/80 backdrop-blur-sm rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.1)] flex items-center justify-center z-30 group cursor-pointer ${transform || ''}`}
-    style={{ top, left, right, bottom }}
-    title="Xem nhanh sản phẩm"
-  >
-    <span className="w-2.5 h-2.5 bg-[#0ABBCE] rounded-full group-hover:scale-150 transition-transform duration-300 animate-pulse"></span>
-  </button>
-);
-
-// --- CÁC MODULE LAYOUT ĐƯỢC TÁCH RA ĐỂ DỄ DÀNG XÁO TRỘN ---
-const mockImages = [
-  "https://images.unsplash.com/photo-1599643478514-4a4e03152d5b?auto=format&fit=crop&q=80&w=400",
-  "https://images.unsplash.com/photo-1605100804763-247f661204d8?auto=format&fit=crop&q=80&w=400",
-  "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=400",
-  "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=400"
-];
-
-const Block1 = ({ id, idx, activeProduct, setActiveProduct }) => (
-  <section className="px-5 mb-14 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both" style={{ animationDelay: `${idx * 150}ms` }}>
-    <h2 className="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em] text-[#1d1d1f]">
-      TRANG SỨC ECZ
-    </h2>
-    
-    {/* Một hình nền chung chứa 4 hotspot trang sức */}
-    <div className="w-full h-[450px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
-      <img src="https://res.cloudinary.com/dzkiwoek4/image/upload/v1774516856/h%C3%ACnh_4sp_lx7vey.jpg" alt="Trang sức ECZ" className="absolute inset-0 w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-black/0 hover:bg-black/5 transition-colors duration-500"></div>
-      
-      {/* Điểm nhấn 1: Nhẫn */}
-      <ProductPoint groupId={id} top="40%" left="32%" product={{ name: "Nhẫn Kim Cương", price: "5.500.000đ", images: [
-        "https://images.unsplash.com/photo-1605100804763-247f661204d8?auto=format&fit=crop&q=80&w=400",
-        ...mockImages.slice(0, 3)
-      ] }} onClick={setActiveProduct} />
-      
-      {/* Điểm nhấn 2: Lắc tay */}
-      <ProductPoint groupId={id} top="35%" right="28%" product={{ name: "Lắc Tay Sang Trọng", price: "4.750.000đ", images: [
-        "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=400",
-        ...mockImages.slice(0, 3)
-      ] }} onClick={setActiveProduct} />
-      
-      {/* Điểm nhấn 3: Dây chuyền */}
-      <ProductPoint groupId={id} bottom="22%" left="42%" transform="-translate-x-1/2" product={{ name: "Dây Chuyền Vàng", price: "8.200.000đ", images: [
-        "https://images.unsplash.com/photo-1599643478514-4a4e03152d5b?auto=format&fit=crop&q=80&w=400",
-        ...mockImages.slice(0, 3)
-      ] }} onClick={setActiveProduct} />
-      
-      {/* Điểm nhấn 4: Bông tai */}
-      <ProductPoint groupId={id} bottom="12%" right="32%" transform="translate-x-1/2" product={{ name: "Bông Tai Bạc", price: "3.300.000đ", images: [
-        "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=400",
-        ...mockImages.slice(0, 3)
-      ] }} onClick={setActiveProduct} />
-
-      {activeProduct?.groupId === id && (
-        <OverlapPopup product={activeProduct} position="center" onClose={() => setActiveProduct(null)} />
-      )}
-    </div>
-  </section>
-);
-
-const Block3 = ({ id, idx, activeProduct, setActiveProduct }) => (
-  <section className="px-5 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both" style={{ animationDelay: `${idx * 150}ms` }}>
-    <h2 className="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em] text-[#1d1d1f]">
-      LOREM IPSUM<br />DOLOR SIT AMET
-    </h2>
-    <div 
-      className="w-full h-[350px] bg-[#f5f5f7] rounded-2xl mb-6 flex items-center justify-center cursor-pointer overflow-hidden group relative bg-cover bg-center"
-      style={{ backgroundImage: `url('https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&q=80&w=800')` }}
-    >
-      <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-500"></div>
-      <div className="w-20 h-20 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-sm z-10">
-        <Play fill="#1d1d1f" className="w-8 h-8 text-[#1d1d1f] ml-1" />
-      </div>
-    </div>
-    <div 
-      className="w-full h-[180px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden bg-cover bg-center"
-      style={{ backgroundImage: `url('https://images.unsplash.com/photo-1606293459218-10e309fb93d7?auto=format&fit=crop&q=80&w=800')` }}
-    >
-       <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]"></div>
-       <ProductPoint groupId={id} top="20%" left="15%" product={{ name: "Khuyên Tai Bạch Kim", price: "150.000đ", images: mockImages }} onClick={setActiveProduct} />
-       <ProductPoint groupId={id} bottom="25%" right="25%" product={{ name: "Vòng Tay Hoa Hồng", price: "250.000đ", images: mockImages }} onClick={setActiveProduct} />
-       <ProductPoint groupId={id} bottom="10%" left="35%" product={{ name: "Mặt Dây Chuyền Sapphire", price: "350.000đ", images: mockImages }} onClick={setActiveProduct} />
-       {activeProduct?.groupId === id && (
-         <OverlapPopup product={activeProduct} position="center" onClose={() => setActiveProduct(null)} />
-       )}
-    </div>
-  </section>
-);
-
-const Block4 = ({ id, idx, activeProduct, setActiveProduct }) => (
-  <section className="px-5 mb-28 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both" style={{ animationDelay: `${idx * 150}ms` }}>
-    <h2 className="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em] text-[#1d1d1f]">
-      BỘ SƯU TẬP MỚI
-    </h2>
-    <div className="w-full h-[450px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
-      <img src="image_22eee4.jpg" alt="Bộ sưu tập mới" className="absolute inset-0 w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-black/0 hover:bg-black/5 transition-colors duration-500"></div>
-      
-      {/* Dây chuyền (Trên giữa) */}
-      <ProductPoint groupId={id} top="25%" left="45%" transform="-translate-x-1/2" product={{ name: "Dây Chuyền Mặt Hoa", price: "8.200.000đ", images: mockImages }} onClick={setActiveProduct} />
-      
-      {/* Lắc Tay (Dưới giữa) */}
-      <ProductPoint groupId={id} bottom="20%" left="45%" transform="-translate-x-1/2" product={{ name: "Vòng Tay Hoa Hồng", price: "6.800.000đ", images: mockImages }} onClick={setActiveProduct} />
-      
-      {/* Nhẫn (Góc dưới phải) */}
-      <ProductPoint groupId={id} bottom="15%" right="15%" product={{ name: "Nhẫn Hoa Xà Cừ", price: "4.500.000đ", images: mockImages }} onClick={setActiveProduct} />
-      
-      {activeProduct?.groupId === id && (
-        <OverlapPopup product={activeProduct} position="center" onClose={() => setActiveProduct(null)} />
-      )}
-    </div>
-  </section>
-);
-
-// MỚI: Block 5 - Layout Grid 2 Cột hình ảnh
-const Block5 = ({ id, idx, activeProduct, setActiveProduct }) => (
-  <section className="px-5 mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both relative" style={{ animationDelay: `${idx * 150}ms` }}>
-    <h2 className="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em] text-[#1d1d1f]">
-      PREMIUM COLLECTION
-    </h2>
-    <div className="flex gap-4">
-      <div 
-        className="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner bg-cover bg-center overflow-hidden"
-        style={{ backgroundImage: `url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=400')` }}
-      >
-        <div className="absolute inset-0 bg-black/10 hover:bg-black/20 transition-colors duration-500"></div>
-        <ProductPoint groupId={`${id}_left`} top="50%" left="50%" transform="-translate-x-1/2 -translate-y-1/2" product={{ name: "Bông Tai Cao Cấp", price: "1.200.000đ", images: mockImages }} onClick={setActiveProduct} />
-      </div>
-      <div 
-        className="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner bg-cover bg-center overflow-hidden"
-        style={{ backgroundImage: `url('https://images.unsplash.com/photo-1605100804763-247f661204d8?auto=format&fit=crop&q=80&w=400')` }}
-      >
-        <div className="absolute inset-0 bg-black/10 hover:bg-black/20 transition-colors duration-500"></div>
-        <ProductPoint groupId={`${id}_right`} top="50%" left="50%" transform="-translate-x-1/2 -translate-y-1/2" product={{ name: "Nhẫn Đính Hôn", price: "900.000đ", images: mockImages }} onClick={setActiveProduct} />
-      </div>
-    </div>
-    {/* Popups render bên ngoài flex để tránh bị che khuất */}
-    {activeProduct?.groupId === `${id}_left` && (
-      <OverlapPopup product={activeProduct} position="left" onClose={() => setActiveProduct(null)} />
-    )}
-    {activeProduct?.groupId === `${id}_right` && (
-      <OverlapPopup product={activeProduct} position="center" onClose={() => setActiveProduct(null)} />
-    )}
-  </section>
-);
-
-// MỚI: Block 6 - Layout Video ngang lớn (Landscape)
-const Block6 = ({ idx }) => (
-  <section className="px-5 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both" style={{ animationDelay: `${idx * 150}ms` }}>
-    <h2 className="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em] text-[#1d1d1f]">
-      EXCLUSIVE VIDEO
-    </h2>
-    <div className="w-full aspect-video bg-[#f5f5f7] rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden group shadow-inner relative">
-      <video 
-        autoPlay 
-        loop 
-        muted 
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover"
-      >
-        <source src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4" type="video/mp4" />
-      </video>
-      <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-500"></div>
-      <div className="w-16 h-16 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-sm z-10">
-        <Play fill="#1d1d1f" className="w-6 h-6 text-[#1d1d1f] ml-1" />
-      </div>
-    </div>
-  </section>
-);
-
-export default function App() {
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [agreed, setAgreed] = useState(false);
-  const [activeProduct, setActiveProduct] = useState(null);
-  
-  const [activeBranch, setActiveBranch] = useState('PNJ');
-  const branches = ['PNJ', 'STYLE By PNJ', 'Disney|PNJ', 'MANCODE by PNJ'];
-
-  // Cấu trúc mới dài hơn, 7 layout blocks / mỗi branch
-  const layoutMap = {
-    'PNJ': [1, 5, 3, 6, 4, 1],
-    'STYLE By PNJ': [6, 1, 5, 4, 3, 5],
-    'Disney|PNJ': [3, 6, 1, 5, 4, 1],
-    'MANCODE by PNJ': [5, 4, 6, 3, 1, 5],
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!agreed) return;
-    alert(`Đã đăng ký nhận ưu đãi cho:\nTên: ${name}\nSĐT: ${phone}`);
-    setName('');
-    setPhone('');
-    setAgreed(false);
-  };
-
-  return (
-    <div className="min-h-screen bg-[#fbfbfd] py-0 sm:py-8 flex justify-center selection:bg-[#0ABBCE] selection:text-white">
-      <div className="w-full max-w-[500px] bg-white sm:shadow-[0_20px_60px_rgba(0,0,0,0.05)] sm:rounded-3xl relative overflow-hidden font-sans text-[#1d1d1f]">
+        // --- CÁC HÀM ĐIỀU KHIỂN ---
         
-        {/* Header - Liquid Glass Style */}
-        <div className="sticky top-0 z-50 pt-4 pb-4 px-4 bg-white/90 backdrop-blur-xl border-b border-gray-100 shadow-sm">
-          <header className="flex justify-between items-center px-2 py-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.15em] bg-white/40 backdrop-blur-2xl backdrop-saturate-150 rounded-2xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.08)] relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-white/60 to-transparent pointer-events-none"></div>
-            {branches.map(branch => (
-              <button
-                key={branch}
-                onClick={() => {
-                  setActiveBranch(branch);
-                  setActiveProduct(null);
-                }}
-                className={`relative z-10 px-3 py-2.5 rounded-xl transition-all duration-300 ${
-                  activeBranch === branch 
-                    ? 'bg-[#003865] text-white font-bold scale-105 shadow-[0_4px_12px_rgba(0,56,101,0.4)]' 
-                    : 'border-transparent text-[#1d1d1f] hover:bg-white/30'
-                }`}
-              >
-                {branch}
-              </button>
-            ))}
-          </header>
-        </div>
+        // Lưu và khôi phục trạng thái form để không bị mất chữ khi Popup mở/đóng
+        function getFormState() {
+            return {
+                name: document.getElementById('formName')?.value || '',
+                phone: document.getElementById('formPhone')?.value || '',
+                agree: document.getElementById('formAgree')?.checked || false
+            };
+        }
 
-        {/* Wrapper nội dung */}
-        <div key={activeBranch} className="animate-in fade-in slide-in-from-right-4 duration-700">
-          
-          {/* Hero Video/Image (Full screen 9:16) */}
-          <section className="w-full aspect-[9/16] max-h-screen bg-[#f5f5f7] flex items-center justify-center relative cursor-pointer group overflow-hidden">
-            <video 
-              autoPlay 
-              loop 
-              muted 
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover"
-            >
-              <source src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4" type="video/mp4" />
-            </video>
-            {/* Lớp phủ mờ nhẹ khi hover giúp tăng chiều sâu */}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500"></div>
-          </section>
+        function restoreFormState(s) {
+            const n = document.getElementById('formName'); if(n) n.value = s.name;
+            const p = document.getElementById('formPhone'); if(p) p.value = s.phone;
+            const a = document.getElementById('formAgree'); if(a) a.checked = s.agree;
+        }
 
-          {/* Đoạn giới thiệu */}
-          <section className="px-8 py-12 text-center">
-            <h2 className="text-sm font-semibold text-[#0ABBCE] mb-4 uppercase tracking-widest">Ưu đãi tại {activeBranch}</h2>
-            <p className="text-[14px] font-medium leading-relaxed text-[#86868b]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-              do eiusmod tempor incididunt ut labore et dolore magna
-              aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-              ullamco laboris nisi ut aliquip ex ea commodo consequat.
-            </p>
-          </section>
+        function setActiveBranch(branch) {
+            const fs = getFormState();
+            state.activeBranch = branch;
+            state.activePopup = null;
+            renderApp();
+            restoreFormState(fs);
+        }
 
-          {/* HIỂN THỊ CÁC KHỐI SẢN PHẨM TỰ ĐỘNG SINH ID ĐỘNG */}
-          {layoutMap[activeBranch].map((blockType, idx) => {
-            const blockId = `${activeBranch}-type${blockType}-idx${idx}`; // ID cực kỳ độc nhất
-            switch (blockType) {
-              case 1: return <Block1 key={blockId} id={blockId} idx={idx} activeProduct={activeProduct} setActiveProduct={setActiveProduct} />;
-              case 3: return <Block3 key={blockId} id={blockId} idx={idx} activeProduct={activeProduct} setActiveProduct={setActiveProduct} />;
-              case 4: return <Block4 key={blockId} id={blockId} idx={idx} activeProduct={activeProduct} setActiveProduct={setActiveProduct} />;
-              case 5: return <Block5 key={blockId} id={blockId} idx={idx} activeProduct={activeProduct} setActiveProduct={setActiveProduct} />;
-              case 6: return <Block6 key={blockId} idx={idx} />;
-              default: return null;
-            }
-          })}
+        function openPopup(productId, groupId, position) {
+            const fs = getFormState();
+            state.activePopup = { productId, groupId, position };
+            state.popupImageIdx = 0;
+            renderApp();
+            restoreFormState(fs);
+        }
 
-          {/* Khối 5: Form Đăng Ký (Minimalist Apple Style) */}
-          <section className="px-5 pb-16 mt-8">
-            <div className="bg-white rounded-2xl p-8 shadow-[0_8px_40px_rgba(0,0,0,0.06)] border border-gray-100">
-              <h3 className="text-center font-serif text-xl mb-6 uppercase tracking-[0.1em] text-[#1d1d1f]">
-                ƯU ĐÃI DÀNH RIÊNG<br/>CHO BẠN
-              </h3>
+        function closePopup() {
+            const fs = getFormState();
+            state.activePopup = null;
+            renderApp();
+            restoreFormState(fs);
+        }
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="flex flex-col sm:flex-row gap-4 mb-2">
-                  <input
-                    type="text"
-                    placeholder="Tên"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full sm:w-1/2 px-4 py-3.5 bg-[#f5f5f7] rounded-xl text-sm outline-none font-medium placeholder:font-normal placeholder:text-[#86868b] focus:ring-2 focus:ring-[#0ABBCE]/30 focus:bg-white transition-all"
-                    required
-                  />
-                  <input
-                    type="tel"
-                    placeholder="Số điện thoại"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full sm:w-1/2 px-4 py-3.5 bg-[#f5f5f7] rounded-xl text-sm outline-none font-medium placeholder:font-normal placeholder:text-[#86868b] focus:ring-2 focus:ring-[#0ABBCE]/30 focus:bg-white transition-all"
-                    required
-                  />
+        function nextImg() {
+            const product = productDB[state.activePopup.productId];
+            state.popupImageIdx = state.popupImageIdx === product.images.length - 1 ? 0 : state.popupImageIdx + 1;
+            const fs = getFormState();
+            renderApp();
+            restoreFormState(fs);
+        }
+
+        function prevImg() {
+            const product = productDB[state.activePopup.productId];
+            state.popupImageIdx = state.popupImageIdx === 0 ? product.images.length - 1 : state.popupImageIdx - 1;
+            const fs = getFormState();
+            renderApp();
+            restoreFormState(fs);
+        }
+
+        function setImg(idx) {
+            state.popupImageIdx = idx;
+            const fs = getFormState();
+            renderApp();
+            restoreFormState(fs);
+        }
+
+        function submitForm(e) {
+            e.preventDefault();
+            const fs = getFormState();
+            if (!fs.agree) return;
+            alert(`Đã đăng ký nhận ưu đãi cho:\nTên: ${fs.name}\nSĐT: ${fs.phone}`);
+            
+            // Xoá form
+            const n = document.getElementById('formName'); if(n) n.value = '';
+            const p = document.getElementById('formPhone'); if(p) p.value = '';
+            const a = document.getElementById('formAgree'); if(a) a.checked = false;
+        }
+
+        // --- CÁC HÀM RENDER COMPONENTS ---
+        
+        function playIconSVG(className) {
+            return `<svg class="${className}" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>`;
+        }
+
+        function renderPopupForGroup(groupId) {
+            if (!state.activePopup || state.activePopup.groupId !== groupId) return '';
+            
+            const product = productDB[state.activePopup.productId];
+            const posClass = state.activePopup.position === 'center' ? 'left-1/2 -translate-x-1/2' : 'left-5';
+            const imgUrl = product.images[state.popupImageIdx];
+
+            let dots = product.images.map((_, idx) => `
+                <button onclick="event.stopPropagation(); setImg(${idx})" class="h-1.5 rounded-full transition-all duration-300 ${state.popupImageIdx === idx ? 'bg-[#0ABBCE] w-4' : 'bg-[#1d1d1f]/20 hover:bg-[#1d1d1f]/40 w-1.5'}"></button>
+            `).join('');
+
+            return `
+                <div class="absolute -bottom-20 ${posClass} w-[250px] h-[310px] bg-gradient-to-br from-white/70 to-white/30 backdrop-blur-xl backdrop-saturate-150 shadow-[0_12px_40px_rgba(0,0,0,0.12)] rounded-t-3xl rounded-b-2xl flex flex-col p-3 border border-white/80 z-40 animate-zoom-in">
+                    <button onclick="event.stopPropagation(); closePopup()" class="absolute top-3 right-3 bg-white/50 backdrop-blur-md p-1.5 rounded-full text-[#1d1d1f] hover:bg-white/80 shadow-sm z-20 transition-colors border border-white/50">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                    
+                    <div class="flex-1 flex flex-col w-full h-full relative">
+                        <h3 class="font-semibold text-[15px] text-[#1d1d1f] pr-8 leading-tight font-sans tracking-wide truncate">${product.name}</h3>
+                        <p class="text-[#0ABBCE] font-medium text-xs mb-2 mt-1">${product.price}</p>
+                        
+                        <div class="relative flex-1 w-full rounded-2xl overflow-hidden bg-black/5 group shadow-inner">
+                            <img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover animate-fade-in" />
+                            <div class="absolute inset-0 flex items-center justify-between px-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <button onclick="event.stopPropagation(); prevImg()" class="p-1 bg-white/40 backdrop-blur-md rounded-full text-[#1d1d1f] hover:bg-white/70 transition-colors">
+                                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="event.stopPropagation(); nextImg()" class="p-1 bg-white/40 backdrop-blur-md rounded-full text-[#1d1d1f] hover:bg-white/70 transition-colors">
+                                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <div class="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                                ${dots}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="alert('Đang chuyển hướng đến trang Mua Hàng của: ${product.name}')" class="w-full mt-3 bg-white/60 backdrop-blur-md border border-white text-[#0ABBCE] py-2.5 rounded-xl font-semibold text-xs tracking-widest hover:bg-[#0ABBCE] hover:text-white hover:border-[#0ABBCE] hover:shadow-[0_4px_14px_rgba(10,187,206,0.39)] transition-all duration-300 shrink-0 uppercase">
+                        MUA NGAY
+                    </button>
                 </div>
+            `;
+        }
 
-                <div className="bg-[#f5f5f7]/50 rounded-xl p-4 mb-4">
-                  <ul className="text-[12px] font-medium list-disc pl-4 space-y-1.5 text-[#86868b]">
-                    <li>Mã ưu đãi sẽ được gửi đến sđt của bạn bằng zalo/SMS.</li>
-                    <li>Mã ưu đãi sẽ có hiệu lực sau 30 phút</li>
-                    <li>Thời hạn sử dụng: đến hết ngày 30/4</li>
-                  </ul>
-                </div>
-
-                <div className="flex items-start gap-3 mb-8">
-                  <input
-                    type="checkbox"
-                    id="agree"
-                    checked={agreed}
-                    onChange={(e) => setAgreed(e.target.checked)}
-                    className="w-4 h-4 accent-[#0ABBCE] cursor-pointer mt-0.5 rounded"
-                    required
-                  />
-                  <label htmlFor="agree" className="text-[12px] font-medium cursor-pointer select-none text-[#86868b] leading-tight pt-0.5">
-                    Đồng ý với điều khoản dịch vụ và chính sách bảo mật.
-                  </label>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-[#0ABBCE] hover:bg-[#1d1d1f] text-white font-semibold text-sm py-4 rounded-xl transition-colors duration-500 tracking-widest uppercase shadow-[0_4px_14px_rgba(10,187,206,0.39)] hover:shadow-[0_4px_14px_rgba(29,29,31,0.39)]"
-                >
-                  NHẬN NGAY
+        function renderProductPoint(top, left, right, bottom, transform, productId, groupId, position) {
+            return `
+                <button onclick="event.stopPropagation(); openPopup('${productId}', '${groupId}', '${position}')" class="absolute w-7 h-7 bg-white/80 backdrop-blur-sm rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.1)] flex items-center justify-center z-30 group cursor-pointer ${transform || ''}" style="top:${top}; left:${left}; right:${right}; bottom:${bottom};" title="Xem nhanh sản phẩm">
+                    <span class="w-2.5 h-2.5 bg-[#0ABBCE] rounded-full group-hover:scale-150 transition-transform duration-300 animate-pulse"></span>
                 </button>
-              </form>
-            </div>
-          </section>
+            `;
+        }
 
-        </div>
-      </div>
-    </div>
-  );
-}
+        function renderBlock1(idx, blockId) {
+            return `
+            <section class="px-5 mb-14 animate-slide-up" style="animation-delay: ${idx * 150}ms; animation-fill-mode: both;">
+                <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em] text-[#1d1d1f]">TRANG SỨC ECZ</h2>
+                <div class="w-full h-[450px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
+                    <img src="https://res.cloudinary.com/dzkiwoek4/image/upload/v1774516856/h%C3%ACnh_4sp_lx7vey.jpg" alt="Trang sức ECZ" class="absolute inset-0 w-full h-full object-cover" />
+                    <div class="absolute inset-0 bg-black/0 hover:bg-black/5 transition-colors duration-500"></div>
+                    ${renderProductPoint('40%', '32%', '', '', '', 'nhan_kim_cuong', blockId, 'center')}
+                    ${renderProductPoint('35%', '', '28%', '', '', 'lac_tay_sang_trong', blockId, 'center')}
+                    ${renderProductPoint('', '42%', '', '22%', '-translate-x-1/2', 'day_chuyen_vang', blockId, 'center')}
+                    ${renderProductPoint('', '', '32%', '12%', 'translate-x-1/2', 'bong_tai_bac', blockId, 'center')}
+                    ${renderPopupForGroup(blockId)}
+                </div>
+            </section>
+            `;
+        }
+
+        function renderBlock3(idx, blockId) {
+            return `
+            <section class="px-5 mb-16 animate-slide-up" style="animation-delay: ${idx * 150}ms; animation-fill-mode: both;">
+                <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em] text-[#1d1d1f]">LOREM IPSUM<br />DOLOR SIT AMET</h2>
+                <div class="w-full h-[350px] bg-[#f5f5f7] rounded-2xl mb-6 flex items-center justify-center cursor-pointer overflow-hidden group relative bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&q=80&w=800')">
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-500"></div>
+                    <div class="w-20 h-20 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-sm z-10">
+                        ${playIconSVG("w-8 h-8 text-[#1d1d1f] ml-1")}
+                    </div>
+                </div>
+                <div class="w-full h-[180px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1606293459218-10e309fb93d7?auto=format&fit=crop&q=80&w=800')">
+                    <div class="absolute inset-0 bg-white/30 backdrop-blur-[2px]"></div>
+                    ${renderProductPoint('20%', '15%', '', '', '', 'khuyen_tai_bach_kim', blockId, 'center')}
+                    ${renderProductPoint('', '', '25%', '25%', '', 'vong_tay_hoa_hong', blockId, 'center')}
+                    ${renderProductPoint('', '35%', '', '10%', '', 'mat_day_chuyen_sapphire', blockId, 'center')}
+                    ${renderPopupForGroup(blockId)}
+                </div>
+            </section>
+            `;
+        }
+
+        function renderBlock4(idx, blockId) {
+            return `
+            <section class="px-5 mb-28 animate-slide-up" style="animation-delay: ${idx * 150}ms; animation-fill-mode: both;">
+                <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em] text-[#1d1d1f]">BỘ SƯU TẬP MỚI</h2>
+                <div class="w-full h-[450px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
+                    <img src="image_22eee4.jpg" alt="Bộ sưu tập mới" class="absolute inset-0 w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1605100804763-247f661204d8?auto=format&fit=crop&q=80&w=800'" />
+                    <div class="absolute inset-0 bg-black/0 hover:bg-black/5 transition-colors duration-500"></div>
+                    ${renderProductPoint('25%', '45%', '', '', '-translate-x-1/2', 'day_chuyen_mat_hoa', blockId, 'center')}
+                    ${renderProductPoint('', '45%', '', '20%', '-translate-x-1/2', 'vong_tay_hoa_hong_2', blockId, 'center')}
+                    ${renderProductPoint('', '', '15%', '15%', '', 'nhan_hoa_xa_cu', blockId, 'center')}
+                    ${renderPopupForGroup(blockId)}
+                </div>
+            </section>
+            `;
+        }
+
+        function renderBlock5(idx, blockId) {
+            return `
+            <section class="px-5 mb-20 animate-slide-up relative" style="animation-delay: ${idx * 150}ms; animation-fill-mode: both;">
+                <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em] text-[#1d1d1f]">PREMIUM COLLECTION</h2>
+                <div class="flex gap-4">
+                    <div class="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner bg-cover bg-center overflow-hidden" style="background-image: url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=400')">
+                        <div class="absolute inset-0 bg-black/10 hover:bg-black/20 transition-colors duration-500"></div>
+                        ${renderProductPoint('50%', '50%', '', '', '-translate-x-1/2 -translate-y-1/2', 'bong_tai_cao_cap', blockId + '_left', 'left')}
+                    </div>
+                    <div class="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner bg-cover bg-center overflow-hidden" style="background-image: url('https://images.unsplash.com/photo-1605100804763-247f661204d8?auto=format&fit=crop&q=80&w=400')">
+                        <div class="absolute inset-0 bg-black/10 hover:bg-black/20 transition-colors duration-500"></div>
+                        ${renderProductPoint('50%', '50%', '', '', '-translate-x-1/2 -translate-y-1/2', 'nhan_dinh_hon', blockId + '_right', 'center')}
+                    </div>
+                </div>
+                ${renderPopupForGroup(blockId + '_left')}
+                ${renderPopupForGroup(blockId + '_right')}
+            </section>
+            `;
+        }
+
+        function renderBlock6(idx, blockId) {
+            return `
+            <section class="px-5 mb-16 animate-slide-up" style="animation-delay: ${idx * 150}ms; animation-fill-mode: both;">
+                <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em] text-[#1d1d1f]">EXCLUSIVE VIDEO</h2>
+                <div class="w-full aspect-video bg-[#f5f5f7] rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden group shadow-inner relative">
+                    <video autoPlay loop muted playsInline class="absolute inset-0 w-full h-full object-cover">
+                        <source src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4" type="video/mp4" />
+                    </video>
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-500"></div>
+                    <div class="w-16 h-16 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-sm z-10">
+                        ${playIconSVG("w-6 h-6 text-[#1d1d1f] ml-1")}
+                    </div>
+                </div>
+            </section>
+            `;
+        }
+
+        function renderMain() {
+            const blocksHTML = layoutMap[state.activeBranch].map((blockType, idx) => {
+                const blockId = `${state.activeBranch}-type${blockType}-idx${idx}`;
+                switch(blockType) {
+                    case 1: return renderBlock1(idx, blockId);
+                    case 3: return renderBlock3(idx, blockId);
+                    case 4: return renderBlock4(idx, blockId);
+                    case 5: return renderBlock5(idx, blockId);
+                    case 6: return renderBlock6(idx, blockId);
+                    default: return '';
+                }
+            }).join('');
+
+            return `
+            <div class="min-h-screen py-0 sm:py-8 flex justify-center">
+                <div class="w-full max-w-[500px] bg-white sm:shadow-[0_20px_60px_rgba(0,0,0,0.05)] sm:rounded-3xl relative overflow-hidden font-sans text-[#1d1d1f]">
+                    
+                    <!-- Header -->
+                    <div class="sticky top-0 z-50 pt-4 pb-4 px-4 bg-white/90 backdrop-blur-xl border-b border-gray-100 shadow-sm">
+                        <header class="flex justify-between items-center px-2 py-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.15em] bg-white/40 backdrop-blur-2xl backdrop-saturate-150 rounded-2xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.08)] relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-b from-white/60 to-transparent pointer-events-none"></div>
+                            ${branches.map(branch => `
+                                <button onclick="setActiveBranch('${branch}')" class="relative z-10 px-3 py-2.5 rounded-xl transition-all duration-300 ${state.activeBranch === branch ? 'bg-[#003865] text-white font-bold scale-105 shadow-[0_4px_12px_rgba(0,56,101,0.4)]' : 'border-transparent text-[#1d1d1f] hover:bg-white/30'}">
+                                    ${branch}
+                                </button>
+                            `).join('')}
+                        </header>
+                    </div>
+
+                    <!-- Nội Dung Tab Hiện Tại -->
+                    <div class="animate-slide-right">
+                        <!-- Hero Video -->
+                        <section class="w-full aspect-[9/16] max-h-screen bg-[#f5f5f7] flex items-center justify-center relative cursor-pointer group overflow-hidden">
+                            <video autoPlay loop muted playsInline class="absolute inset-0 w-full h-full object-cover">
+                                <source src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4" type="video/mp4" />
+                            </video>
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500"></div>
+                        </section>
+
+                        <!-- Giới thiệu -->
+                        <section class="px-8 py-12 text-center">
+                            <h2 class="text-sm font-semibold text-[#0ABBCE] mb-4 uppercase tracking-widest">Ưu đãi tại ${state.activeBranch}</h2>
+                            <p class="text-[14px] font-medium leading-relaxed text-[#86868b]">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                            </p>
+                        </section>
+
+                        <!-- Danh sách Block Sản Phẩm -->
+                        ${blocksHTML}
+
+                        <!-- Form Đăng Ký -->
+                        <section class="px-5 pb-16 mt-8">
+                            <div class="bg-white rounded-2xl p-8 shadow-[0_8px_40px_rgba(0,0,0,0.06)] border border-gray-100">
+                                <h3 class="text-center font-serif text-xl mb-6 uppercase tracking-[0.1em] text-[#1d1d1f]">ƯU ĐÃI DÀNH RIÊNG<br/>CHO BẠN</h3>
+                                <form onsubmit="submitForm(event)" class="space-y-4">
+                                    <div class="flex flex-col sm:flex-row gap-4 mb-2">
+                                        <input type="text" id="formName" placeholder="Tên" class="w-full sm:w-1/2 px-4 py-3.5 bg-[#f5f5f7] rounded-xl text-sm outline-none font-medium placeholder:font-normal placeholder:text-[#86868b] focus:ring-2 focus:ring-[#0ABBCE]/30 focus:bg-white transition-all" required />
+                                        <input type="tel" id="formPhone" placeholder="Số điện thoại" class="w-full sm:w-1/2 px-4 py-3.5 bg-[#f5f5f7] rounded-xl text-sm outline-none font-medium placeholder:font-normal placeholder:text-[#86868b] focus:ring-2 focus:ring-[#0ABBCE]/30 focus:bg-white transition-all" required />
+                                    </div>
+                                    <div class="bg-[#f5f5f7]/50 rounded-xl p-4 mb-4">
+                                        <ul class="text-[12px] font-medium list-disc pl-4 space-y-1.5 text-[#86868b]">
+                                            <li>Mã ưu đãi sẽ được gửi đến sđt của bạn bằng zalo/SMS.</li>
+                                            <li>Mã ưu đãi sẽ có hiệu lực sau 30 phút</li>
+                                            <li>Thời hạn sử dụng: đến hết ngày 30/4</li>
+                                        </ul>
+                                    </div>
+                                    <div class="flex items-start gap-3 mb-8">
+                                        <input type="checkbox" id="formAgree" class="w-4 h-4 accent-[#0ABBCE] cursor-pointer mt-0.5 rounded" required />
+                                        <label for="formAgree" class="text-[12px] font-medium cursor-pointer select-none text-[#86868b] leading-tight pt-0.5">Đồng ý với điều khoản dịch vụ và chính sách bảo mật.</label>
+                                    </div>
+                                    <button type="submit" class="w-full bg-[#0ABBCE] hover:bg-[#1d1d1f] text-white font-semibold text-sm py-4 rounded-xl transition-colors duration-500 tracking-widest uppercase shadow-[0_4px_14px_rgba(10,187,206,0.39)] hover:shadow-[0_4px_14px_rgba(29,29,31,0.39)]">NHẬN NGAY</button>
+                                </form>
+                            </div>
+                        </section>
+
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        // --- HÀM KHỞI TẠO ---
+        function renderApp() {
+            document.getElementById('app').innerHTML = renderMain();
+            lucide.createIcons(); // Nạp lại icon mỗi khi render lại DOM
+        }
+
+        // Chạy lần đầu
+        renderApp();
+    </script>
+</body>
+</html>
