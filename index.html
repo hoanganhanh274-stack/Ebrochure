@@ -27,12 +27,19 @@
         }
 
         /* Animations */
-        @keyframes fadeInZoom {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-        .animate-popup {
-            animation: fadeInZoom 0.3s ease-out forwards;
+        @keyframes scaleUp {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-fade {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .animate-modal {
+            animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         @keyframes slideInRight {
@@ -55,8 +62,8 @@
 </head>
 <body>
 
-<div id="app" class="min-h-screen py-0 sm:py-8 flex justify-center selection:bg-[#0ABBCE] selection:text-white">
-    <div class="w-full max-w-[500px] bg-[#f0fafe] sm:shadow-[0_20px_60px_rgba(0,0,0,0.05)] sm:rounded-3xl relative overflow-hidden text-[#1d1d1f]">
+<div id="app" class="min-h-screen py-0 sm:py-8 flex justify-center selection:bg-[#0ABBCE] selection:text-white relative">
+    <div class="w-full max-w-[500px] bg-[#f0fafe] sm:shadow-[0_20px_60px_rgba(0,0,0,0.05)] sm:rounded-3xl relative overflow-x-hidden text-[#1d1d1f]">
         
         <!-- Header -->
         <div class="sticky top-0 z-50 bg-[#f0fafe] px-4 py-3 shadow-sm">
@@ -91,7 +98,7 @@
             <section class="px-8 py-12 text-center">
                 <h2 class="text-sm font-semibold text-[#0ABBCE] mb-4 uppercase tracking-widest">Ưu đãi tại {{ activeBranch }}</h2>
                 <p class="text-[14px] font-medium leading-relaxed text-[#86868b]">
-                    Khám phá bộ sưu tập trang sức tinh tế, nơi vẻ đẹp truyền thống gặp gỡ sự hiện đại. PNJ mang đến những tác phẩm nghệ thuật tôn vinh khí chất riêng biệt của bạn.
+                    Khám phá bộ sưu tập trang sức tinh tế, tôn vinh vẻ đẹp và khí chất riêng của bạn.
                 </p>
             </section>
 
@@ -108,24 +115,19 @@
                             :src="blockType === 1 ? 'https://res.cloudinary.com/drdkxe3mw/image/upload/v1774594555/p1_nmicdh.jpg' : 'https://res.cloudinary.com/drdkxe3mw/image/upload/v1774594555/p2_fo0aqd.jpg'" 
                             class="absolute inset-0 w-full h-full object-cover rounded-2xl"
                         >
-                        <!-- Hotspots for Block 1 -->
                         <div v-if="blockType === 1">
-                            <hotspot top="53%" left="22%" :product="{ name: 'Mặt Dây Chuyền', price: '1.200.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot top="42%" right="26%" :product="{ name: 'Bông Tai Kim Cương', price: '850.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot bottom="40%" left="46%" :product="{ name: 'Nhẫn Cưới Trái Tim', price: '2.400.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot bottom="14%" left="28%" :product="{ name: 'Nhẫn Kim Cương', price: '1.800.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot bottom="28%" right="24%" :product="{ name: 'Nhẫn Đính Hôn', price: '2.100.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                            <hotspot top="30%" left="22%" :product="{ name: 'Mặt Dây Chuyền', price: '1.200.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                            <hotspot top="35%" right="26%" :product="{ name: 'Bông Tai Kim Cương', price: '850.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                            <hotspot bottom="40%" left="46%" :product="{ name: 'Nhẫn Cưới Trái Tim', price: '2.400.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                            <hotspot bottom="14%" left="28%" :product="{ name: 'Nhẫn Kim Cương', price: '1.800.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                            <hotspot bottom="28%" right="24%" :product="{ name: 'Nhẫn Đính Hôn', price: '2.100.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
                         </div>
-                        <!-- Hotspots for Block 4 -->
                         <div v-else>
                             <hotspot top="35%" left="40%" :product="{ name: 'Dây Chuyền Vô Cực', price: '1.850.000đ', images: mockImages }" @open="openPopup"></hotspot>
                             <hotspot top="51%" left="26%" :product="{ name: 'Bông Tai Vô Cực', price: '1.200.000đ', images: mockImages }" @open="openPopup"></hotspot>
                             <hotspot top="57%" right="30%" :product="{ name: 'Lắc Tay Vô Cực', price: '1.450.000đ', images: mockImages }" @open="openPopup"></hotspot>
                             <hotspot bottom="18%" left="50%" :product="{ name: 'Nhẫn Vô Cực', price: '2.100.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
                         </div>
-                        
-                        <!-- Local Popup -->
-                        <overlap-popup v-if="activeProduct && activeProduct.blockIdx === idx" :product="activeProduct" @close="closePopup"></overlap-popup>
                     </div>
                 </section>
 
@@ -154,7 +156,6 @@
                     </h2>
                     <div class="w-full h-[350px] rounded-2xl mb-6 relative overflow-hidden group shadow-inner">
                         <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4"></video>
-                        <div class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
                             <div class="w-20 h-20 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                                 <i data-lucide="play" class="w-8 h-8 ml-1 fill-[#1d1d1f]"></i>
@@ -163,8 +164,7 @@
                     </div>
                     <div class="w-full h-[180px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
                         <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover rounded-2xl">
-                        <hotspot top="50%" left="55%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Kim Cương Vàng Trắng', price: '1.550.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                        <overlap-popup v-if="activeProduct && activeProduct.blockIdx === idx" :product="activeProduct" @close="closePopup"></overlap-popup>
+                        <hotspot top="50%" left="55%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Kim Cương Vàng Trắng', price: '1.550.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
                     </div>
                 </section>
 
@@ -176,14 +176,13 @@
                     <div class="flex gap-4">
                         <div class="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
                             <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover">
-                            <hotspot top="45%" left="40%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Đính Hôn', price: '900.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                            <hotspot top="50%" left="50%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Đính Hôn', price: '900.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
                         </div>
                         <div class="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
                             <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover">
                             <hotspot top="50%" left="50%" transform="translate(-50%, -50%)" :product="{ name: 'Dây Chuyền Vàng', price: '450.000đ', images: mockImages }" @open="openPopup"></hotspot>
                         </div>
                     </div>
-                    <overlap-popup v-if="activeProduct && activeProduct.blockIdx === idx" :product="activeProduct" @close="closePopup"></overlap-popup>
                 </section>
 
                 <!-- Block 6 (Exclusive Video Landscape) -->
@@ -193,7 +192,6 @@
                     </h2>
                     <div class="w-full aspect-video bg-[#f5f5f7] rounded-2xl relative overflow-hidden group shadow-inner">
                         <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4"></video>
-                        <div class="absolute inset-0 bg-black/10 group-hover:bg-black/20"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
                             <div class="w-16 h-16 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                                 <i data-lucide="play" class="w-6 h-6 ml-1 fill-[#1d1d1f]"></i>
@@ -204,7 +202,7 @@
 
             </div>
 
-            <!-- Registration Form -->
+            <!-- Form -->
             <section class="px-5 pb-16 mt-8">
                 <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
                     <h3 class="text-center font-serif text-xl mb-6 uppercase tracking-[0.1em]">
@@ -224,7 +222,7 @@
                         </div>
                         <div class="flex items-start gap-3 mb-8">
                             <input v-model="formData.agreed" type="checkbox" id="agree" class="w-4 h-4 accent-[#0ABBCE] cursor-pointer mt-0.5" required>
-                            <label for="agree" class="text-[12px] font-medium text-[#86868b] cursor-pointer select-none">Đồng ý với điều khoản dịch vụ và chính sách bảo mật.</label>
+                            <label for="agree" class="text-[12px] font-medium text-[#86868b] cursor-pointer select-none">Đồng ý với điều khoản dịch vụ.</label>
                         </div>
                         <button type="submit" class="w-full bg-[#0ABBCE] hover:bg-[#1d1d1f] text-white font-semibold text-sm py-4 rounded-xl transition-all uppercase shadow-lg">
                             NHẬN NGAY
@@ -232,15 +230,20 @@
                     </form>
                 </div>
             </section>
-
         </div>
+
+        <!-- Global Popup Overlay -->
+        <div v-if="activeProduct" @click="closePopup" class="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fade">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+            <overlap-popup :product="activeProduct" @close="closePopup" @click.stop></overlap-popup>
+        </div>
+
     </div>
 </div>
 
 <script>
     const { createApp, ref, onMounted, nextTick } = Vue;
 
-    // Component Hotspot (Dấu chấm tròn)
     const Hotspot = {
         props: ['top', 'left', 'right', 'bottom', 'transform', 'product'],
         template: `
@@ -254,7 +257,6 @@
         `
     };
 
-    // Component Popup
     const OverlapPopup = {
         props: ['product'],
         setup(props, { emit }) {
@@ -265,25 +267,35 @@
             return { currentImg, nextImg, prevImg, emit };
         },
         template: `
-            <div class="absolute -bottom-20 left-1/2 -translate-x-1/2 w-[250px] h-[310px] bg-gradient-to-br from-white/90 to-white/60 backdrop-blur-xl shadow-2xl rounded-t-3xl rounded-b-2xl flex flex-col p-3 border border-white/80 z-40 animate-popup">
-                <button @click.stop="emit('close')" class="absolute top-3 right-3 bg-white/50 p-1.5 rounded-full z-20"><i data-lucide="x" class="w-3.5 h-3.5 text-[#1d1d1f]"></i></button>
-                <div class="flex-1 flex flex-col w-full h-full relative">
-                    <h3 class="font-semibold text-[15px] truncate pr-6">{{ product.name }}</h3>
-                    <p class="text-[#0ABBCE] font-medium text-xs mb-2">{{ product.price }}</p>
-                    <div class="relative flex-1 w-full rounded-2xl overflow-hidden bg-black/5 group shadow-inner">
+            <div class="relative w-full max-w-[320px] bg-white rounded-3xl overflow-hidden shadow-2xl animate-modal">
+                <button @click.stop="emit('close')" class="absolute top-4 right-4 bg-white/80 backdrop-blur-md p-2 rounded-full z-20 shadow-sm hover:bg-white transition-colors">
+                    <i data-lucide="x" class="w-4 h-4 text-black"></i>
+                </button>
+                
+                <div class="p-6">
+                    <h3 class="font-bold text-lg mb-1">{{ product.name }}</h3>
+                    <p class="text-[#0ABBCE] font-bold text-sm mb-4">{{ product.price }}</p>
+                    
+                    <div class="aspect-square bg-white rounded-2xl relative overflow-hidden group shadow-inner flex items-center justify-center">
                         <template v-if="product.images[currentImg].startsWith('http')">
-                             <img :src="product.images[currentImg]" class="absolute inset-0 w-full h-full object-cover">
+                             <img :src="product.images[currentImg]" class="absolute inset-0 w-full h-full object-contain p-2">
                         </template>
                         <template v-else>
-                             <div class="absolute inset-0 flex items-center justify-center text-[10px] text-gray-400">Ảnh minh hoạ {{currentImg + 1}}</div>
+                             <div class="absolute inset-0 flex items-center justify-center text-sm text-gray-400">Ảnh minh hoạ {{currentImg + 1}}</div>
                         </template>
-                        <div class="absolute inset-0 flex items-center justify-between px-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button @click.stop="prevImg" class="p-1 bg-white/40 rounded-full"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-                            <button @click.stop="nextImg" class="p-1 bg-white/40 rounded-full"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                        
+                        <div v-if="product.images.length > 1" class="absolute inset-0 flex items-center justify-between px-2">
+                            <button @click.stop="prevImg" class="p-2 bg-white/60 rounded-full hover:bg-white transition-colors shadow-sm"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                            <button @click.stop="nextImg" class="p-2 bg-white/60 rounded-full hover:bg-white transition-colors shadow-sm"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                        </div>
+
+                        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                            <div v-for="(_, idx) in product.images" :key="idx" :class="['w-1.5 h-1.5 rounded-full transition-all', currentImg === idx ? 'bg-[#0ABBCE] w-4' : 'bg-black/20']"></div>
                         </div>
                     </div>
+
+                    <button @click="alert('Đang chuyển hướng mua hàng...')" class="w-full mt-6 bg-[#003366] text-white py-4 rounded-xl font-bold tracking-widest hover:bg-black transition-all uppercase shadow-lg">MUA NGAY</button>
                 </div>
-                <button @click="alert('Đang chuyển hướng...')" class="w-full mt-3 bg-white text-[#0ABBCE] py-2.5 rounded-xl font-bold text-[10px] tracking-widest hover:bg-[#0ABBCE] hover:text-white border border-white transition-all uppercase">MUA NGAY</button>
             </div>
         `,
         mounted() { lucide.createIcons(); }
@@ -293,20 +305,20 @@
         components: { hotspot: Hotspot, 'overlap-popup': OverlapPopup },
         setup() {
             const activeBranch = ref('RẠNG RỠ MỖI NGÀY');
-            const branches = ['RẠNG RỠ MỖI NGÀY', 'KHẲNG ĐỊNH PHONG THÁI', 'DẤU ẤN ĐẲNG CẤP', 'ƯU ĐÃI ĐẶC BIỆT'];
+            const branches = ['RẠNG RỠ MỖI NGÀY', 'KHẲNG ĐỊNH PHONG THÁI', 'DẤU ĂN ĐẲNG CẤP', 'ƯU ĐÃI ĐẶC BIỆT'];
             const branchLabels = {
                 'RẠNG RỠ MỖI NGÀY': 'RẠNG RỠ<br/>MỖI NGÀY',
                 'KHẲNG ĐỊNH PHONG THÁI': 'KHẲNG ĐỊNH<br/>PHONG THÁI',
-                'DẤU ẤN ĐẲNG CẤP': 'DẤU ẤN<br/>ĐẲNG CẤP',
+                'DẤU ĂN ĐẲNG CẤP': 'DẤU ĂN<br/>ĐẲNG CẤP',
                 'ƯU ĐÃI ĐẶC BIỆT': 'ƯU ĐÃI<br/>ĐẶC BIỆT',
             };
             const layoutMap = {
                 'RẠNG RỠ MỖI NGÀY': [1, 5, 2, 3, 6, 4, 1],
                 'KHẲNG ĐỊNH PHONG THÁI': [6, 1, 5, 2, 4, 3, 5],
-                'DẤU ẤN ĐẲNG CẤP': [3, 6, 1, 5, 4, 2, 1],
+                'DẤU ĂN ĐẲNG CẤP': [3, 6, 1, 5, 4, 2, 1],
                 'ƯU ĐÃI ĐẶC BIỆT': [5, 4, 6, 3, 2, 1, 5],
             };
-            const mockImages = ["bg-gray-200/50", "bg-gray-300/60", "bg-gray-400/50"];
+            const mockImages = ["bg-gray-200", "bg-gray-300", "bg-gray-400"];
             const activeProduct = ref(null);
             const formData = ref({ name: '', phone: '', agreed: false });
 
@@ -317,8 +329,6 @@
             };
 
             const openPopup = (product) => {
-                // Chúng ta chỉ đơn giản hiển thị popup (React logic dùng blockId phức tạp hơn)
-                // Ở bản này ta sẽ tìm blockId hiện tại
                 activeProduct.value = product;
                 nextTick(() => lucide.createIcons());
             };
@@ -326,7 +336,7 @@
             const closePopup = () => activeProduct.value = null;
 
             const handleForm = () => {
-                alert(`Cảm ơn ${formData.value.name}! Chúng tôi sẽ gửi mã ưu đãi đến ${formData.value.phone} sớm nhất.`);
+                alert(`Cảm ơn! Chúng tôi đã nhận được thông tin.`);
                 formData.value = { name: '', phone: '', agreed: false };
             };
 
