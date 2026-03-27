@@ -108,25 +108,27 @@
                 <!-- Block 1 & 4 (Image 3:4 with hotspots) -->
                 <section v-if="blockType === 1 || blockType === 4" class="px-5 mb-14">
                     <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em]">
-                        LOREM IPSUM<br />DOLOR SIT AMET
+                        {{ blockType === 1 ? 'GIÁ TRỊ CỦA SỰ TỰ TIN' : 'VÔ CỰC YÊU THƯƠNG' }}
                     </h2>
                     <div class="w-full aspect-[3/4] bg-[#f5f5f7] rounded-2xl relative shadow-inner">
                         <img 
                             :src="blockType === 1 ? 'https://res.cloudinary.com/drdkxe3mw/image/upload/v1774594555/p1_nmicdh.jpg' : 'https://res.cloudinary.com/drdkxe3mw/image/upload/v1774594555/p2_fo0aqd.jpg'" 
                             class="absolute inset-0 w-full h-full object-cover rounded-2xl"
                         >
+                        <!-- Hotspots for Block 1 (Moved beside jewelry) -->
                         <div v-if="blockType === 1">
-                            <hotspot top="30%" left="22%" :product="{ name: 'Mặt Dây Chuyền', price: '1.200.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot top="35%" right="26%" :product="{ name: 'Bông Tai Kim Cương', price: '850.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot bottom="40%" left="46%" :product="{ name: 'Nhẫn Cưới Trái Tim', price: '2.400.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
-                            <hotspot bottom="14%" left="28%" :product="{ name: 'Nhẫn Kim Cương', price: '1.800.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
-                            <hotspot bottom="28%" right="24%" :product="{ name: 'Nhẫn Đính Hôn', price: '2.100.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                            <hotspot top="40%" left="18%" :product="{ name: 'Mặt Dây Chuyền', price: '1.200.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                            <hotspot top="40%" right="18%" :product="{ name: 'Bông Tai Kim Cương', price: '850.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                            <hotspot bottom="32%" left="48%" :product="{ name: 'Nhẫn Cưới Trái Tim', price: '2.400.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                            <hotspot bottom="23%" left="16%" :product="{ name: 'Nhẫn Kim Cương', price: '1.800.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                            <hotspot bottom="23%" right="16%" :product="{ name: 'Nhẫn Đính Hôn', price: '2.100.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
                         </div>
+                        <!-- Hotspots for Block 4 (Moved beside jewelry) -->
                         <div v-else>
-                            <hotspot top="35%" left="40%" :product="{ name: 'Dây Chuyền Vô Cực', price: '1.850.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot top="51%" left="26%" :product="{ name: 'Bông Tai Vô Cực', price: '1.200.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot top="57%" right="30%" :product="{ name: 'Lắc Tay Vô Cực', price: '1.450.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot bottom="18%" left="50%" :product="{ name: 'Nhẫn Vô Cực', price: '2.100.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                            <hotspot top="38%" left="46%" :product="{ name: 'Dây Chuyền Vô Cực', price: '1.850.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                            <hotspot top="60%" left="22%" :product="{ name: 'Bông Tai Vô Cực', price: '1.200.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                            <hotspot top="58%" right="20%" :product="{ name: 'Lắc Tay Vô Cực', price: '1.450.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                            <hotspot bottom="12%" left="55%" :product="{ name: 'Nhẫn Vô Cực', price: '2.100.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
                         </div>
                     </div>
                 </section>
@@ -152,7 +154,7 @@
                 <!-- Block 3 (Video + Small Image Hotspot) -->
                 <section v-if="blockType === 3" class="px-5 mb-16">
                     <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em]">
-                        LOREM IPSUM<br />DOLOR SIT AMET
+                        SỰ LỰA CHỌN HOÀN HẢO
                     </h2>
                     <div class="w-full h-[350px] rounded-2xl mb-6 relative overflow-hidden group shadow-inner">
                         <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4"></video>
@@ -164,7 +166,7 @@
                     </div>
                     <div class="w-full h-[180px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
                         <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover rounded-2xl">
-                        <hotspot top="50%" left="55%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Kim Cương Vàng Trắng', price: '1.550.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                        <hotspot top="40%" left="65%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Kim Cương Vàng Trắng', price: '1.550.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
                     </div>
                 </section>
 
@@ -176,11 +178,11 @@
                     <div class="flex gap-4">
                         <div class="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
                             <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover">
-                            <hotspot top="50%" left="50%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Đính Hôn', price: '900.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                            <hotspot top="60%" left="60%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Đính Hôn', price: '900.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
                         </div>
                         <div class="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
                             <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover">
-                            <hotspot top="50%" left="50%" transform="translate(-50%, -50%)" :product="{ name: 'Dây Chuyền Vàng', price: '450.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                            <hotspot top="60%" left="60%" transform="translate(-50%, -50%)" :product="{ name: 'Dây Chuyền Vàng', price: '450.000đ', images: mockImages }" @open="openPopup"></hotspot>
                         </div>
                     </div>
                 </section>
@@ -249,10 +251,10 @@
         template: `
             <button
                 @click.stop="$emit('open', product)"
-                class="absolute w-7 h-7 bg-white/80 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center z-30 group"
+                class="absolute w-4 h-4 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center z-30 group"
                 :style="{ top, left, right, bottom, transform }"
             >
-                <span class="w-2.5 h-2.5 bg-[#0ABBCE] rounded-full group-hover:scale-150 transition-transform pulse-inner"></span>
+                <span class="w-1.5 h-1.5 bg-[#0ABBCE] rounded-full group-hover:scale-150 transition-transform pulse-inner"></span>
             </button>
         `
     };
