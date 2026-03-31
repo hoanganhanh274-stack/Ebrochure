@@ -63,10 +63,11 @@
 <body>
 
 <div id="app" class="min-h-screen py-0 sm:py-8 flex justify-center selection:bg-[#0ABBCE] selection:text-white relative">
-    <div class="w-full max-w-[500px] bg-[#f0fafe] sm:shadow-[0_20px_60px_rgba(0,0,0,0.05)] sm:rounded-3xl relative overflow-x-hidden text-[#1d1d1f]">
+    <!-- Đã gỡ bỏ overflow-x-hidden ở thẻ cha để sticky có thể hoạt động -->
+    <div class="w-full max-w-[500px] bg-[#f0fafe] sm:shadow-[0_20px_60px_rgba(0,0,0,0.05)] sm:rounded-3xl relative text-[#1d1d1f] flex flex-col">
         
-        <!-- Header -->
-        <div class="sticky top-0 z-50 bg-[#f0fafe] px-4 py-3 shadow-sm">
+        <!-- Header: Thêm sticky và z-50 để luôn nổi lên trên -->
+        <div class="sticky top-0 z-50 bg-[#f0fafe] px-4 py-3 shadow-sm sm:rounded-t-3xl">
             <header class="flex items-stretch gap-1 p-1 bg-white/60 backdrop-blur-md rounded-[2rem] border border-white/50 overflow-x-auto hide-scrollbar snap-x">
                 <button 
                     v-for="branch in branches" 
@@ -82,156 +83,159 @@
             </header>
         </div>
 
-        <!-- Content Wrapper -->
-        <div :key="activeBranch" class="animate-slide-right">
-            
-            <!-- Hero Video (9:16) -->
-            <section class="w-full aspect-[9/16] max-h-screen bg-black relative overflow-hidden">
-                <video 
-                    autoplay muted loop playsinline
-                    class="absolute inset-0 w-full h-full object-cover"
-                    src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4"
-                ></video>
-            </section>
-
-            <!-- Intro Section -->
-            <section class="px-8 py-12 text-center">
-                <h2 class="text-sm font-semibold text-[#0ABBCE] mb-4 uppercase tracking-widest">Ưu đãi tại {{ activeBranch }}</h2>
-                <p class="text-[14px] font-medium leading-relaxed text-[#86868b]">
-                    Khám phá bộ sưu tập trang sức tinh tế, tôn vinh vẻ đẹp và khí chất riêng của bạn.
-                </p>
-            </section>
-
-            <!-- Layout Blocks -->
-            <div v-for="(blockType, idx) in layoutMap[activeBranch]" :key="idx">
+        <!-- Bọc khung cuộn riêng cho phần content để không cản trở Sticky -->
+        <div class="overflow-x-hidden sm:rounded-b-3xl">
+            <!-- Content Wrapper -->
+            <div :key="activeBranch" class="animate-slide-right">
                 
-                <!-- Block 1 & 4 (Image 3:4 with hotspots) -->
-                <section v-if="blockType === 1 || blockType === 4" class="px-5 mb-14">
-                    <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em]">
-                        {{ blockType === 1 ? 'GIÁ TRỊ CỦA SỰ TỰ TIN' : 'VÔ CỰC YÊU THƯƠNG' }}
-                    </h2>
-                    <div class="w-full aspect-[3/4] bg-[#f5f5f7] rounded-2xl relative shadow-inner">
-                        <img 
-                            :src="blockType === 1 ? 'https://res.cloudinary.com/drdkxe3mw/image/upload/v1774594555/p1_nmicdh.jpg' : 'https://res.cloudinary.com/drdkxe3mw/image/upload/v1774594555/p2_fo0aqd.jpg'" 
-                            class="absolute inset-0 w-full h-full object-cover rounded-2xl"
-                        >
-                        <!-- Hotspots for Block 1 (Moved beside jewelry) -->
-                        <div v-if="blockType === 1">
-                            <hotspot top="40%" left="18%" :product="{ name: 'Mặt Dây Chuyền', price: '1.200.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot top="40%" right="18%" :product="{ name: 'Bông Tai Kim Cương', price: '850.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot bottom="32%" left="48%" :product="{ name: 'Nhẫn Cưới Trái Tim', price: '2.400.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
-                            <hotspot bottom="23%" left="16%" :product="{ name: 'Nhẫn Kim Cương', price: '1.800.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
-                            <hotspot bottom="23%" right="16%" :product="{ name: 'Nhẫn Đính Hôn', price: '2.100.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
-                        </div>
-                        <!-- Hotspots for Block 4 (Moved beside jewelry) -->
-                        <div v-else>
-                            <hotspot top="38%" left="46%" :product="{ name: 'Dây Chuyền Vô Cực', price: '1.850.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot top="60%" left="22%" :product="{ name: 'Bông Tai Vô Cực', price: '1.200.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot top="58%" right="20%" :product="{ name: 'Lắc Tay Vô Cực', price: '1.450.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                            <hotspot bottom="12%" left="55%" :product="{ name: 'Nhẫn Vô Cực', price: '2.100.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
-                        </div>
-                    </div>
+                <!-- Hero Video (9:16) -->
+                <section class="w-full aspect-[9/16] max-h-screen bg-black relative overflow-hidden">
+                    <video 
+                        autoplay muted loop playsinline
+                        class="absolute inset-0 w-full h-full object-cover"
+                        :src="heroVideos[activeBranch]"
+                    ></video>
                 </section>
 
-                <!-- Block 2 (Horizontal Video List) -->
-                <section v-if="blockType === 2" class="px-5 mb-16">
-                    <div class="flex gap-4 overflow-x-auto pb-6 snap-x hide-scrollbar">
-                        <div v-for="item in 5" :key="item" class="flex flex-col gap-4 w-[calc(50%-8px)] shrink-0 snap-start group">
-                            <div class="aspect-[4/5] bg-[#f5f5f7] rounded-xl relative overflow-hidden shadow-inner">
-                                <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4"></video>
-                                <div class="absolute bottom-4 right-4 flex gap-3 text-white z-10 drop-shadow-md">
-                                    <i data-lucide="download" class="w-4 h-4 hover:text-[#0ABBCE]"></i>
-                                    <i data-lucide="share-2" class="w-4 h-4 hover:text-[#0ABBCE]"></i>
+                <!-- Intro Section -->
+                <section class="px-8 py-12 text-center">
+                    <h2 class="text-sm font-semibold text-[#0ABBCE] mb-4 uppercase tracking-widest">Ưu đãi tại {{ activeBranch }}</h2>
+                    <p class="text-[14px] font-medium leading-relaxed text-[#86868b]">
+                        Khám phá bộ sưu tập trang sức tinh tế, tôn vinh vẻ đẹp và khí chất riêng của bạn.
+                    </p>
+                </section>
+
+                <!-- Layout Blocks -->
+                <div v-for="(blockType, idx) in layoutMap[activeBranch]" :key="idx">
+                    
+                    <!-- Block 1 & 4 (Image 3:4 with hotspots) -->
+                    <section v-if="blockType === 1 || blockType === 4" class="px-5 mb-14">
+                        <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em]">
+                            {{ blockType === 1 ? 'GIÁ TRỊ CỦA SỰ TỰ TIN' : 'VÔ CỰC YÊU THƯƠNG' }}
+                        </h2>
+                        <div class="w-full aspect-[3/4] bg-[#f5f5f7] rounded-2xl relative shadow-inner">
+                            <img 
+                                :src="blockType === 1 ? 'https://res.cloudinary.com/drdkxe3mw/image/upload/v1774594555/p1_nmicdh.jpg' : 'https://res.cloudinary.com/drdkxe3mw/image/upload/v1774594555/p2_fo0aqd.jpg'" 
+                                class="absolute inset-0 w-full h-full object-cover rounded-2xl"
+                            >
+                            <!-- Hotspots for Block 1 -->
+                            <div v-if="blockType === 1">
+                                <hotspot top="40%" left="18%" :product="{ name: 'Mặt Dây Chuyền', price: '1.200.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                                <hotspot top="40%" right="18%" :product="{ name: 'Bông Tai Kim Cương', price: '850.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                                <hotspot bottom="32%" left="48%" :product="{ name: 'Nhẫn Cưới Trái Tim', price: '2.400.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                                <hotspot bottom="23%" left="16%" :product="{ name: 'Nhẫn Kim Cương', price: '1.800.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                                <hotspot bottom="23%" right="16%" :product="{ name: 'Nhẫn Đính Hôn', price: '2.100.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                            </div>
+                            <!-- Hotspots for Block 4 -->
+                            <div v-else>
+                                <hotspot top="38%" left="46%" :product="{ name: 'Dây Chuyền Vô Cực', price: '1.850.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                                <hotspot top="60%" left="22%" :product="{ name: 'Bông Tai Vô Cực', price: '1.200.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                                <hotspot top="58%" right="20%" :product="{ name: 'Lắc Tay Vô Cực', price: '1.450.000đ', images: mockImages }" @open="openPopup"></hotspot>
+                                <hotspot bottom="12%" left="55%" :product="{ name: 'Nhẫn Vô Cực', price: '2.100.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Block 2 (Horizontal Video List) -->
+                    <section v-if="blockType === 2" class="px-5 mb-16">
+                        <div class="flex gap-4 overflow-x-auto pb-6 snap-x hide-scrollbar">
+                            <div v-for="item in 5" :key="item" class="flex flex-col gap-4 w-[calc(50%-8px)] shrink-0 snap-start group">
+                                <div class="aspect-[4/5] bg-[#f5f5f7] rounded-xl relative overflow-hidden shadow-inner">
+                                    <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4"></video>
+                                    <div class="absolute bottom-4 right-4 flex gap-3 text-white z-10 drop-shadow-md">
+                                        <i data-lucide="download" class="w-4 h-4 hover:text-[#0ABBCE]"></i>
+                                        <i data-lucide="share-2" class="w-4 h-4 hover:text-[#0ABBCE]"></i>
+                                    </div>
+                                </div>
+                                <button class="w-full border border-[#1d1d1f] text-[#1d1d1f] py-2.5 rounded-xl font-medium text-xs tracking-widest hover:bg-[#1d1d1f] hover:text-white transition-all uppercase">
+                                    MUA NGAY
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Block 3 (Video + Small Image Hotspot) -->
+                    <section v-if="blockType === 3" class="px-5 mb-16">
+                        <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em]">
+                            SỰ LỰA CHỌN HOÀN HẢO
+                        </h2>
+                        <div class="w-full h-[350px] rounded-2xl mb-6 relative overflow-hidden group shadow-inner">
+                            <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4"></video>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-20 h-20 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <i data-lucide="play" class="w-8 h-8 ml-1 fill-[#1d1d1f]"></i>
                                 </div>
                             </div>
-                            <button class="w-full border border-[#1d1d1f] text-[#1d1d1f] py-2.5 rounded-xl font-medium text-xs tracking-widest hover:bg-[#1d1d1f] hover:text-white transition-all uppercase">
-                                MUA NGAY
-                            </button>
                         </div>
-                    </div>
-                </section>
+                        <div class="w-full h-[180px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
+                            <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover rounded-2xl">
+                            <hotspot top="40%" left="65%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Kim Cương Vàng Trắng', price: '1.550.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                        </div>
+                    </section>
 
-                <!-- Block 3 (Video + Small Image Hotspot) -->
-                <section v-if="blockType === 3" class="px-5 mb-16">
-                    <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em]">
-                        SỰ LỰA CHỌN HOÀN HẢO
-                    </h2>
-                    <div class="w-full h-[350px] rounded-2xl mb-6 relative overflow-hidden group shadow-inner">
-                        <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4"></video>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="w-20 h-20 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <i data-lucide="play" class="w-8 h-8 ml-1 fill-[#1d1d1f]"></i>
+                    <!-- Block 5 (Grid 2 columns) -->
+                    <section v-if="blockType === 5" class="px-5 mb-20 relative">
+                        <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em]">
+                            PREMIUM COLLECTION
+                        </h2>
+                        <div class="flex gap-4">
+                            <div class="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
+                                <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover">
+                                <hotspot top="60%" left="60%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Đính Hôn', price: '900.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
+                            </div>
+                            <div class="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
+                                <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover">
+                                <hotspot top="60%" left="60%" transform="translate(-50%, -50%)" :product="{ name: 'Dây Chuyền Vàng', price: '450.000đ', images: mockImages }" @open="openPopup"></hotspot>
                             </div>
                         </div>
-                    </div>
-                    <div class="w-full h-[180px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
-                        <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover rounded-2xl">
-                        <hotspot top="40%" left="65%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Kim Cương Vàng Trắng', price: '1.550.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- Block 5 (Grid 2 columns) -->
-                <section v-if="blockType === 5" class="px-5 mb-20 relative">
-                    <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em]">
-                        PREMIUM COLLECTION
-                    </h2>
-                    <div class="flex gap-4">
-                        <div class="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
-                            <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover">
-                            <hotspot top="60%" left="60%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Đính Hôn', price: '900.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
-                        </div>
-                        <div class="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
-                            <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover">
-                            <hotspot top="60%" left="60%" transform="translate(-50%, -50%)" :product="{ name: 'Dây Chuyền Vàng', price: '450.000đ', images: mockImages }" @open="openPopup"></hotspot>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Block 6 (Exclusive Video Landscape) -->
-                <section v-if="blockType === 6" class="px-5 mb-16">
-                    <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em]">
-                        EXCLUSIVE VIDEO
-                    </h2>
-                    <div class="w-full aspect-video bg-[#f5f5f7] rounded-2xl relative overflow-hidden group shadow-inner">
-                        <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4"></video>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="w-16 h-16 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <i data-lucide="play" class="w-6 h-6 ml-1 fill-[#1d1d1f]"></i>
+                    <!-- Block 6 (Exclusive Video Landscape) -->
+                    <section v-if="blockType === 6" class="px-5 mb-16">
+                        <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em]">
+                            EXCLUSIVE VIDEO
+                        </h2>
+                        <div class="w-full aspect-video bg-[#f5f5f7] rounded-2xl relative overflow-hidden group shadow-inner">
+                            <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4"></video>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-16 h-16 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <i data-lucide="play" class="w-6 h-6 ml-1 fill-[#1d1d1f]"></i>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-            </div>
-
-            <!-- Form -->
-            <section class="px-5 pb-16 mt-8">
-                <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                    <h3 class="text-center font-serif text-xl mb-6 uppercase tracking-[0.1em]">
-                        ƯU ĐÃI DÀNH RIÊNG<br/>CHO BẠN
-                    </h3>
-                    <form @submit.prevent="handleForm" class="space-y-4">
-                        <div class="flex flex-col sm:flex-row gap-4 mb-2">
-                            <input v-model="formData.name" type="text" placeholder="Tên" class="w-full sm:w-1/2 px-4 py-3.5 bg-[#f5f5f7] rounded-xl text-sm outline-none font-medium focus:ring-2 focus:ring-[#0ABBCE]/30 focus:bg-white transition-all" required>
-                            <input v-model="formData.phone" type="tel" placeholder="Số điện thoại" class="w-full sm:w-1/2 px-4 py-3.5 bg-[#f5f5f7] rounded-xl text-sm outline-none font-medium focus:ring-2 focus:ring-[#0ABBCE]/30 focus:bg-white transition-all" required>
-                        </div>
-                        <div class="bg-[#f5f5f7]/50 rounded-xl p-4 mb-4">
-                            <ul class="text-[12px] font-medium list-disc pl-4 space-y-1.5 text-[#86868b]">
-                                <li>Mã ưu đãi sẽ được gửi đến sđt của bạn.</li>
-                                <li>Mã ưu đãi sẽ có hiệu lực sau 30 phút</li>
-                                <li>Thời hạn sử dụng: đến hết ngày 30/4</li>
-                            </ul>
-                        </div>
-                        <div class="flex items-start gap-3 mb-8">
-                            <input v-model="formData.agreed" type="checkbox" id="agree" class="w-4 h-4 accent-[#0ABBCE] cursor-pointer mt-0.5" required>
-                            <label for="agree" class="text-[12px] font-medium text-[#86868b] cursor-pointer select-none">Đồng ý với điều khoản dịch vụ.</label>
-                        </div>
-                        <button type="submit" class="w-full bg-[#0ABBCE] hover:bg-[#1d1d1f] text-white font-semibold text-sm py-4 rounded-xl transition-all uppercase shadow-lg">
-                            NHẬN NGAY
-                        </button>
-                    </form>
                 </div>
-            </section>
+
+                <!-- Form -->
+                <section class="px-5 pb-16 mt-8">
+                    <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                        <h3 class="text-center font-serif text-xl mb-6 uppercase tracking-[0.1em]">
+                            ƯU ĐÃI DÀNH RIÊNG<br/>CHO BẠN
+                        </h3>
+                        <form @submit.prevent="handleForm" class="space-y-4">
+                            <div class="flex flex-col sm:flex-row gap-4 mb-2">
+                                <input v-model="formData.name" type="text" placeholder="Tên" class="w-full sm:w-1/2 px-4 py-3.5 bg-[#f5f5f7] rounded-xl text-sm outline-none font-medium focus:ring-2 focus:ring-[#0ABBCE]/30 focus:bg-white transition-all" required>
+                                <input v-model="formData.phone" type="tel" placeholder="Số điện thoại" class="w-full sm:w-1/2 px-4 py-3.5 bg-[#f5f5f7] rounded-xl text-sm outline-none font-medium focus:ring-2 focus:ring-[#0ABBCE]/30 focus:bg-white transition-all" required>
+                            </div>
+                            <div class="bg-[#f5f5f7]/50 rounded-xl p-4 mb-4">
+                                <ul class="text-[12px] font-medium list-disc pl-4 space-y-1.5 text-[#86868b]">
+                                    <li>Mã ưu đãi sẽ được gửi đến sđt của bạn.</li>
+                                    <li>Mã ưu đãi sẽ có hiệu lực sau 30 phút</li>
+                                    <li>Thời hạn sử dụng: đến hết ngày 30/4</li>
+                                </ul>
+                            </div>
+                            <div class="flex items-start gap-3 mb-8">
+                                <input v-model="formData.agreed" type="checkbox" id="agree" class="w-4 h-4 accent-[#0ABBCE] cursor-pointer mt-0.5" required>
+                                <label for="agree" class="text-[12px] font-medium text-[#86868b] cursor-pointer select-none">Đồng ý với điều khoản dịch vụ.</label>
+                            </div>
+                            <button type="submit" class="w-full bg-[#0ABBCE] hover:bg-[#1d1d1f] text-white font-semibold text-sm py-4 rounded-xl transition-all uppercase shadow-lg">
+                                NHẬN NGAY
+                            </button>
+                        </form>
+                    </div>
+                </section>
+            </div>
         </div>
 
         <!-- Global Popup Overlay -->
@@ -320,6 +324,14 @@
                 'DẤU ẤN ĐẲNG CẤP': [3, 6, 1, 5, 4, 2, 1],
                 'ƯU ĐÃI ĐẶC BIỆT': [5, 4, 6, 3, 2, 1, 5],
             };
+            
+            const heroVideos = {
+                'RẠNG RỠ MỖI NGÀY': 'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4',
+                'KHẲNG ĐỊNH PHONG THÁI': 'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409501/SNZTXMW000047_xi8qsb.mp4',
+                'DẤU ẤN ĐẲNG CẤP': 'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409502/SBXMXMC000054_uhchoq.mp4',
+                'ƯU ĐÃI ĐẶC BIỆT': 'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4',
+            };
+
             const mockImages = ["bg-gray-200", "bg-gray-300", "bg-gray-400"];
             const activeProduct = ref(null);
             const formData = ref({ name: '', phone: '', agreed: false });
@@ -327,6 +339,8 @@
             const changeBranch = (branch) => {
                 activeBranch.value = branch;
                 activeProduct.value = null;
+                // Thêm tự động lướt lên đầu trang khi bấm đổi menu tab
+                window.scrollTo({ top: 0, behavior: 'smooth' });
                 nextTick(() => lucide.createIcons());
             };
 
@@ -345,7 +359,7 @@
             onMounted(() => lucide.createIcons());
 
             return { 
-                activeBranch, branches, branchLabels, layoutMap, 
+                activeBranch, branches, branchLabels, layoutMap, heroVideos,
                 mockImages, activeProduct, formData, 
                 changeBranch, openPopup, closePopup, handleForm 
             };
