@@ -63,60 +63,95 @@
 <body>
 
 <div id="app" class="min-h-screen py-0 sm:py-8 flex justify-center selection:bg-[#0ABBCE] selection:text-white relative">
-    <!-- Đã gỡ bỏ overflow-x-hidden ở thẻ cha để sticky có thể hoạt động -->
     <div class="w-full max-w-[500px] bg-[#f0fafe] sm:shadow-[0_20px_60px_rgba(0,0,0,0.05)] sm:rounded-3xl relative text-[#1d1d1f] flex flex-col">
         
-        <!-- Header: Thêm sticky và z-50 để luôn nổi lên trên -->
-        <div class="sticky top-0 z-50 bg-[#f0fafe] px-4 py-3 shadow-sm sm:rounded-t-3xl">
-            <header class="flex items-stretch gap-1 p-1 bg-white/60 backdrop-blur-md rounded-[2rem] border border-white/50 overflow-x-auto hide-scrollbar snap-x">
-                <button 
+        <!-- Logo PNJ -->
+        <div class="px-5 pt-6 pb-2 sm:rounded-t-3xl bg-[#f0fafe] flex justify-center items-center">
+            <img src="https://res.cloudinary.com/dzkiwoek4/image/upload/v1774939695/logoPNJngang-nenTRANG-01_n57ulo.png" alt="PNJ" class="h-20 sm:h-24 object-contain" />
+        </div>
+
+        <!-- Header: Sticky Tabs -->
+        <div class="sticky top-0 z-50 bg-[#f0fafe] px-4 pb-3 pt-1 shadow-sm">
+            <header class="flex items-start gap-1 p-1.5 bg-white/60 backdrop-blur-md rounded-[2rem] border border-white/50 overflow-x-auto hide-scrollbar snap-x">
+                <div 
                     v-for="branch in branches" 
                     :key="branch"
                     @click="changeBranch(branch)"
-                    :class="[
-                        'relative z-10 flex-1 min-w-[90px] px-2 py-2 text-[10px] sm:text-[11px] shrink-0 snap-center font-bold uppercase tracking-wider rounded-full transition-all duration-300 flex flex-col items-center justify-center text-center leading-[1.3]',
-                        activeBranch === branch ? 'bg-[#003366] text-white shadow-lg' : 'bg-transparent text-[#86868b] hover:text-[#1d1d1f]'
-                    ]"
+                    class="flex flex-col items-center flex-1 min-w-[105px] shrink-0 snap-center gap-1 cursor-pointer group pb-1"
                 >
-                    <span v-html="branchLabels[branch]"></span>
-                </button>
+                    <div 
+                        :class="[
+                            'w-full relative z-10 px-2 py-2.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider rounded-full transition-all duration-300 flex flex-col items-center justify-center text-center leading-[1.3] border',
+                            activeBranch === branch ? 'bg-[#003366] border-[#003366] text-white shadow-lg' : 'bg-white border-gray-200 text-[#86868b] shadow-sm group-hover:border-gray-300 group-hover:text-[#1d1d1f]'
+                        ]"
+                    >
+                        <span v-html="branchTitles[branch]"></span>
+                    </div>
+                </div>
             </header>
         </div>
 
-        <!-- Bọc khung cuộn riêng cho phần content để không cản trở Sticky -->
+        <!-- Content Wrapper -->
         <div class="overflow-x-hidden sm:rounded-b-3xl">
-            <!-- Content Wrapper -->
-            <div :key="activeBranch" class="animate-slide-right">
+            <div :key="activeBranch" class="animate-slide-right bg-white">
                 
-                <!-- Hero Video (9:16) -->
-                <section class="w-full aspect-[9/16] max-h-screen bg-black relative overflow-hidden">
-                    <video 
-                        autoplay muted loop playsinline
-                        class="absolute inset-0 w-full h-full object-cover"
-                        :src="heroVideos[activeBranch]"
-                    ></video>
-                </section>
-
                 <!-- Intro Section -->
-                <section class="px-8 py-12 text-center">
-                    <h2 class="text-sm font-semibold text-[#0ABBCE] mb-4 uppercase tracking-widest">Ưu đãi tại {{ activeBranch }}</h2>
-                    <p class="text-[14px] font-medium leading-relaxed text-[#86868b]">
+                <section class="px-8 pt-8 pb-2 text-center">
+                    <h2 class="text-[28px] font-serif text-center uppercase mb-2 leading-tight tracking-[0.15em]">{{ pageTitles[activeBranch] }}</h2>
+                    <h3 class="text-sm font-semibold text-[#0ABBCE] mb-3 uppercase tracking-widest">{{ activeBranch }}</h3>
+                    <p class="text-[13px] font-medium leading-relaxed text-[#86868b]">
                         Khám phá bộ sưu tập trang sức tinh tế, tôn vinh vẻ đẹp và khí chất riêng của bạn.
                     </p>
                 </section>
 
-                <!-- Layout Blocks -->
+                <!-- Banner Image with Hotspots -->
+                <section class="w-full px-4 pt-4 bg-white" v-if="mainBanners[activeBranch]">
+                    <div class="relative w-full rounded-2xl shadow-sm overflow-hidden">
+                        <img :src="mainBanners[activeBranch].image" alt="PNJ Banner" class="w-full h-auto object-cover" />
+                        
+                        <!-- Hotspots -->
+                        <hotspot 
+                            v-for="(spot, idx) in mainBanners[activeBranch].hotspots" 
+                            :key="idx"
+                            :top="spot.top" 
+                            :left="spot.left" 
+                            :right="spot.right" 
+                            :bottom="spot.bottom" 
+                            :product="spot.product" 
+                            @open="openPopup"
+                        ></hotspot>
+                    </div>
+                </section>
+
+                <!-- Three Frame Videos Below Banner & CTA Button -->
+                <section class="w-full p-4 bg-white relative overflow-hidden" v-if="subBannerVideos[activeBranch]">
+                    <div class="flex gap-2 sm:gap-3 w-full">
+                        <div v-for="(videoUrl, vIdx) in subBannerVideos[activeBranch]" :key="vIdx" class="flex-1 aspect-[9/16] relative overflow-hidden rounded-xl shadow-md ring-1 ring-black/5">
+                            <video 
+                                autoplay muted loop playsinline
+                                class="absolute inset-0 w-full h-full object-cover"
+                                :src="videoUrl"
+                            ></video>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-center">
+                        <a href="https://www.pnj.com.vn" target="_blank" rel="noopener noreferrer" class="inline-block px-10 py-3.5 bg-[#003366] text-white rounded-full font-bold tracking-widest text-center hover:bg-black transition-all uppercase shadow-lg text-[13px]">
+                            XEM THÊM
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Layout Blocks Dynamic -->
                 <div v-for="(blockType, idx) in layoutMap[activeBranch]" :key="idx">
                     
                     <!-- Block 1 & 4 (Image 3:4 with hotspots) -->
                     <section v-if="blockType === 1 || blockType === 4" class="px-5 mb-14">
-                        <h2 class="text-[28px] font-serif text-center uppercase mb-8 leading-tight tracking-[0.15em]">
-                            {{ blockType === 1 ? 'GIÁ TRỊ CỦA SỰ TỰ TIN' : 'VÔ CỰC YÊU THƯƠNG' }}
-                        </h2>
                         <div class="w-full aspect-[3/4] bg-[#f5f5f7] rounded-2xl relative shadow-inner">
                             <img 
                                 :src="blockType === 1 ? 'https://res.cloudinary.com/drdkxe3mw/image/upload/v1774594555/p1_nmicdh.jpg' : 'https://res.cloudinary.com/drdkxe3mw/image/upload/v1774594555/p2_fo0aqd.jpg'" 
                                 class="absolute inset-0 w-full h-full object-cover rounded-2xl"
+                                alt="Collection Image"
                             >
                             <!-- Hotspots for Block 1 -->
                             <div v-if="blockType === 1">
@@ -139,12 +174,12 @@
                     <!-- Block 2 (Horizontal Video List) -->
                     <section v-if="blockType === 2" class="px-5 mb-16">
                         <div class="flex gap-4 overflow-x-auto pb-6 snap-x hide-scrollbar">
-                            <div v-for="item in 5" :key="item" class="flex flex-col gap-4 w-[calc(50%-8px)] shrink-0 snap-start group">
+                            <div v-for="(videoUrl, index) in horizontalVideos[activeBranch]" :key="index" class="flex flex-col gap-4 w-[calc(50%-8px)] shrink-0 snap-start group">
                                 <div class="aspect-[4/5] bg-[#f5f5f7] rounded-xl relative overflow-hidden shadow-inner">
-                                    <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4"></video>
+                                    <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover" :src="videoUrl"></video>
                                     <div class="absolute bottom-4 right-4 flex gap-3 text-white z-10 drop-shadow-md">
-                                        <i data-lucide="download" class="w-4 h-4 hover:text-[#0ABBCE]"></i>
-                                        <i data-lucide="share-2" class="w-4 h-4 hover:text-[#0ABBCE]"></i>
+                                        <i data-lucide="download" class="w-4 h-4 hover:text-[#0ABBCE] cursor-pointer"></i>
+                                        <i data-lucide="share-2" class="w-4 h-4 hover:text-[#0ABBCE] cursor-pointer"></i>
                                     </div>
                                 </div>
                                 <button class="w-full border border-[#1d1d1f] text-[#1d1d1f] py-2.5 rounded-xl font-medium text-xs tracking-widest hover:bg-[#1d1d1f] hover:text-white transition-all uppercase">
@@ -161,14 +196,14 @@
                         </h2>
                         <div class="w-full h-[350px] rounded-2xl mb-6 relative overflow-hidden group shadow-inner">
                             <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4"></video>
-                            <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                                 <div class="w-20 h-20 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <i data-lucide="play" class="w-8 h-8 ml-1 fill-[#1d1d1f]"></i>
                                 </div>
                             </div>
                         </div>
                         <div class="w-full h-[180px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
-                            <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover rounded-2xl">
+                            <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover rounded-2xl" alt="Product">
                             <hotspot top="40%" left="65%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Kim Cương Vàng Trắng', price: '1.550.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
                         </div>
                     </section>
@@ -180,11 +215,11 @@
                         </h2>
                         <div class="flex gap-4">
                             <div class="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
-                                <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover">
+                                <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover" alt="Product">
                                 <hotspot top="60%" left="60%" transform="translate(-50%, -50%)" :product="{ name: 'Nhẫn Đính Hôn', price: '900.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] }" @open="openPopup"></hotspot>
                             </div>
                             <div class="flex-1 h-[260px] bg-[#f5f5f7] rounded-2xl relative shadow-inner overflow-hidden">
-                                <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover">
+                                <img src="https://cdn.pnj.io/images/detailed/270/on-gnddddw015337-nhan-kim-cuong-vang-trang-14k-pnj-kim-bao-nhu-y-1.jpg" class="absolute inset-0 w-full h-full object-cover" alt="Product">
                                 <hotspot top="60%" left="60%" transform="translate(-50%, -50%)" :product="{ name: 'Dây Chuyền Vàng', price: '450.000đ', images: mockImages }" @open="openPopup"></hotspot>
                             </div>
                         </div>
@@ -197,7 +232,7 @@
                         </h2>
                         <div class="w-full aspect-video bg-[#f5f5f7] rounded-2xl relative overflow-hidden group shadow-inner">
                             <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4"></video>
-                            <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                                 <div class="w-16 h-16 bg-white/50 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <i data-lucide="play" class="w-6 h-6 ml-1 fill-[#1d1d1f]"></i>
                                 </div>
@@ -207,7 +242,7 @@
 
                 </div>
 
-                <!-- Form -->
+                <!-- Form Section -->
                 <section class="px-5 pb-16 mt-8">
                     <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
                         <h3 class="text-center font-serif text-xl mb-6 uppercase tracking-[0.1em]">
@@ -250,6 +285,7 @@
 <script>
     const { createApp, ref, onMounted, nextTick } = Vue;
 
+    // Component Hotspot (Điểm chạm trên ảnh)
     const Hotspot = {
         props: ['top', 'left', 'right', 'bottom', 'transform', 'product'],
         template: `
@@ -263,6 +299,7 @@
         `
     };
 
+    // Component Popup hiển thị chi tiết sản phẩm
     const OverlapPopup = {
         props: ['product'],
         setup(props, { emit }) {
@@ -282,84 +319,173 @@
                     <h3 class="font-bold text-lg mb-1">{{ product.name }}</h3>
                     <p class="text-[#0ABBCE] font-bold text-sm mb-4">{{ product.price }}</p>
                     
-                    <div class="aspect-square bg-white rounded-2xl relative overflow-hidden group shadow-inner flex items-center justify-center">
+                    <div class="aspect-square bg-gray-50 rounded-2xl relative overflow-hidden group shadow-inner flex items-center justify-center">
+                        <!-- Hiển thị ảnh thật nếu link hợp lệ, ngược lại hiển thị div giữ chỗ -->
                         <template v-if="product.images[currentImg].startsWith('http')">
-                             <img :src="product.images[currentImg]" class="absolute inset-0 w-full h-full object-contain p-2">
+                             <img :src="product.images[currentImg]" class="absolute inset-0 w-full h-full object-contain p-2" alt="Product Image">
                         </template>
                         <template v-else>
-                             <div class="absolute inset-0 flex items-center justify-center text-sm text-gray-400">Ảnh minh hoạ {{currentImg + 1}}</div>
+                             <div class="absolute inset-0 flex items-center justify-center text-sm text-gray-400 bg-gray-100">Ảnh minh hoạ {{currentImg + 1}}</div>
                         </template>
                         
+                        <!-- Nút điều hướng ảnh -->
                         <div v-if="product.images.length > 1" class="absolute inset-0 flex items-center justify-between px-2">
                             <button @click.stop="prevImg" class="p-2 bg-white/60 rounded-full hover:bg-white transition-colors shadow-sm"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
                             <button @click.stop="nextImg" class="p-2 bg-white/60 rounded-full hover:bg-white transition-colors shadow-sm"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
                         </div>
 
+                        <!-- Dấu chấm chỉ báo trang -->
                         <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                             <div v-for="(_, idx) in product.images" :key="idx" :class="['w-1.5 h-1.5 rounded-full transition-all', currentImg === idx ? 'bg-[#0ABBCE] w-4' : 'bg-black/20']"></div>
                         </div>
                     </div>
 
-                    <button @click="alert('Đang chuyển hướng mua hàng...')" class="w-full mt-6 bg-[#003366] text-white py-4 rounded-xl font-bold tracking-widest hover:bg-black transition-all uppercase shadow-lg">MUA NGAY</button>
+                    <!-- Nút mua hàng: Nếu có link thực thì mở tab mới, ngược lại báo alert -->
+                    <a v-if="product.link" :href="product.link" target="_blank" rel="noopener noreferrer" class="block text-center w-full mt-6 bg-[#003366] text-white py-4 rounded-xl font-bold tracking-widest hover:bg-black transition-all uppercase shadow-lg">
+                        MUA NGAY
+                    </a>
+                    <button v-else @click="alert('Đang chuyển hướng mua hàng...')" class="w-full mt-6 bg-[#003366] text-white py-4 rounded-xl font-bold tracking-widest hover:bg-black transition-all uppercase shadow-lg">
+                        MUA NGAY
+                    </button>
                 </div>
             </div>
         `,
         mounted() { lucide.createIcons(); }
     };
 
+    // Khởi tạo ứng dụng Vue
     const app = createApp({
         components: { hotspot: Hotspot, 'overlap-popup': OverlapPopup },
         setup() {
-            const activeBranch = ref('RẠNG RỠ MỖI NGÀY');
-            const branches = ['RẠNG RỠ MỖI NGÀY', 'KHẲNG ĐỊNH PHONG THÁI', 'DẤU ẤN ĐẲNG CẤP', 'ƯU ĐÃI ĐẶC BIỆT'];
-            const branchLabels = {
-                'RẠNG RỠ MỖI NGÀY': 'RẠNG RỠ<br/>MỖI NGÀY',
-                'KHẲNG ĐỊNH PHONG THÁI': 'KHẲNG ĐỊNH<br/>PHONG THÁI',
-                'DẤU ẤN ĐẲNG CẤP': 'DẤU ẤN<br/>ĐẲNG CẤP',
-                'ƯU ĐÃI ĐẶC BIỆT': 'ƯU ĐÃI<br/>ĐẶC BIỆT',
+            const activeBranch = ref('TƯƠI TRẺ TẠO XU HƯỚNG');
+            const branches = ['TƯƠI TRẺ TẠO XU HƯỚNG', 'SANG TRỌNG ĐỊNH PHONG THÁI', 'ĐẲNG CẤP NGỜI KHÍ CHẤT', 'TRANG SỨC ƯU ĐÃI'];
+            
+            const branchTitles = {
+                'TƯƠI TRẺ TẠO XU HƯỚNG': 'TƯƠI TRẺ<br/><span class="font-normal uppercase text-[8.5px] sm:text-[9.5px] tracking-normal mt-0.5 inline-block">TẠO XU HƯỚNG</span>',
+                'SANG TRỌNG ĐỊNH PHONG THÁI': 'SANG TRỌNG<br/><span class="font-normal uppercase text-[8.5px] sm:text-[9.5px] tracking-normal mt-0.5 inline-block">ĐỊNH PHONG THÁI</span>',
+                'ĐẲNG CẤP NGỜI KHÍ CHẤT': 'ĐẲNG CẤP<br/><span class="font-normal uppercase text-[8.5px] sm:text-[9.5px] tracking-normal mt-0.5 inline-block">NGỜI KHÍ CHẤT</span>',
+                'TRANG SỨC ƯU ĐÃI': 'TRANG SỨC<br/><span class="font-normal uppercase text-[8.5px] sm:text-[9.5px] tracking-normal mt-0.5 inline-block">ƯU ĐÃI</span>',
             };
+
+            const pageTitles = {
+                'TƯƠI TRẺ TẠO XU HƯỚNG': 'GIÁ TRỊ CỦA SỰ TỰ TIN',
+                'SANG TRỌNG ĐỊNH PHONG THÁI': 'GIÁ TRỊ CỦA SỰ TỰ TIN',
+                'ĐẲNG CẤP NGỜI KHÍ CHẤT': 'GIÁ TRỊ CỦA SỰ TỰ TIN',
+                'TRANG SỨC ƯU ĐÃI': 'VÔ CỰC YÊU THƯƠNG',
+            };
+            
+            // Cấu trúc layout cho từng tab
             const layoutMap = {
-                'RẠNG RỠ MỖI NGÀY': [1, 5, 2, 3, 6, 4, 1],
-                'KHẲNG ĐỊNH PHONG THÁI': [6, 1, 5, 2, 4, 3, 5],
-                'DẤU ẤN ĐẲNG CẤP': [3, 6, 1, 5, 4, 2, 1],
-                'ƯU ĐÃI ĐẶC BIỆT': [5, 4, 6, 3, 2, 1, 5],
+                'TƯƠI TRẺ TẠO XU HƯỚNG': [1, 5, 2, 3, 6, 4, 1],
+                'SANG TRỌNG ĐỊNH PHONG THÁI': [6, 1, 5, 2, 4, 3, 5],
+                'ĐẲNG CẤP NGỜI KHÍ CHẤT': [3, 6, 1, 5, 4, 2, 1],
+                'TRANG SỨC ƯU ĐÃI': [5, 4, 6, 3, 2, 1, 5],
             };
             
             const heroVideos = {
-                'RẠNG RỠ MỖI NGÀY': 'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4',
-                'KHẲNG ĐỊNH PHONG THÁI': 'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409501/SNZTXMW000047_xi8qsb.mp4',
-                'DẤU ẤN ĐẲNG CẤP': 'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409502/SBXMXMC000054_uhchoq.mp4',
-                'ƯU ĐÃI ĐẶC BIỆT': 'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4',
+                'TƯƠI TRẺ TẠO XU HƯỚNG': 'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4',
+                'SANG TRỌNG ĐỊNH PHONG THÁI': 'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409501/SNZTXMW000047_xi8qsb.mp4',
+                'ĐẲNG CẤP NGỜI KHÍ CHẤT': 'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409502/SBXMXMC000054_uhchoq.mp4',
+                'TRANG SỨC ƯU ĐÃI': 'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4',
+            };
+
+            const subBannerVideos = {
+                'TƯƠI TRẺ TẠO XU HƯỚNG': [
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409498/SBXM00X000025_dcuwzb.mp4',
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409507/SNZT00W000033_j4wtbk.mp4',
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409498/SCXM00X000016_jpyv1d.mp4'
+                ],
+                'SANG TRỌNG ĐỊNH PHONG THÁI': [
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409498/SBXM00X000025_dcuwzb.mp4',
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409507/SNZT00W000033_j4wtbk.mp4',
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409498/SCXM00X000016_jpyv1d.mp4'
+                ],
+                'ĐẲNG CẤP NGỜI KHÍ CHẤT': [
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409498/SBXM00X000025_dcuwzb.mp4',
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409507/SNZT00W000033_j4wtbk.mp4',
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409498/SCXM00X000016_jpyv1d.mp4'
+                ],
+                'TRANG SỨC ƯU ĐÃI': [
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409498/SBXM00X000025_dcuwzb.mp4',
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409507/SNZT00W000033_j4wtbk.mp4',
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409498/SCXM00X000016_jpyv1d.mp4'
+                ]
+            };
+
+            const horizontalVideos = {
+                'TƯƠI TRẺ TẠO XU HƯỚNG': [
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409503/GV0000C000203_va2xam.mp4',
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409500/GV0000C000202_cfofxg.mp4'
+                ],
+                'SANG TRỌNG ĐỊNH PHONG THÁI': [
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409500/GV0000C000202_cfofxg.mp4',
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409500/GV0000C000202_cfofxg.mp4'
+                ],
+                'ĐẲNG CẤP NGỜI KHÍ CHẤT': [
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409500/GV0000C000202_cfofxg.mp4',
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409500/GV0000C000202_cfofxg.mp4'
+                ],
+                'TRANG SỨC ƯU ĐÃI': [
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409500/GV0000C000202_cfofxg.mp4',
+                    'https://res.cloudinary.com/dzkiwoek4/video/upload/v1774409500/GV0000C000202_cfofxg.mp4'
+                ]
             };
 
             const mockImages = ["bg-gray-200", "bg-gray-300", "bg-gray-400"];
+            
+            // Dữ liệu hotspot cho Banner mặc định có bổ sung link cho sản phẩm dây cổ vàng trắng
+            const defaultHotspots = [
+                { top: '32%', left: '42%', product: { name: 'Dây cổ Vàng Trắng 33,3% (8K) Đính đá ECZ STYLE By PNJ', price: '6.090.000đ', link: 'https://www.pnj.com.vn/site/san-pham/day-co-vang-trang-8k-dinh-da-ecz-style-by-pnj-xmxmw000749.html', images: ['https://cdn.pnj.io/images/detailed/287/on-gcxmxmw000749-day-co-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', 'https://cdn.pnj.io/images/detailed/287/on-gcxmxmw000749-day-co-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-2.jpg', 'https://cdn.pnj.io/images/detailed/287/on-gcxmxmw000749-day-co-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-3.jpg'] } },
+                { top: '56%', left: '15%', product: { name: 'Bông tai Vàng Trắng 33,3% (8K) Đính đá ECZ STYLE By PNJ', price: '4.775.000đ', link: 'https://www.pnj.com.vn/site/san-pham/bong-tai-vang-trang-8k-dinh-da-ecz-style-by-pnj-xm00w001812.html', images: ['https://cdn.pnj.io/images/detailed/287/on-gbxm00w001812-bong-tai-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', 'https://cdn.pnj.io/images/detailed/287/on-gbxm00w001812-bong-tai-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-2.jpg', 'https://cdn.pnj.io/images/detailed/287/on-gbxm00w001812-bong-tai-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-3.jpg'] } },
+                { top: '80%', left: '52%', product: { name: 'Nhẫn Vàng Trắng 33,3% (8K) Đính đá ECZ STYLE By PNJ', price: '3.876.000đ', link: 'https://www.pnj.com.vn/site/san-pham/nhan-vang-trang-8k-dinh-da-ecz-style-by-pnj-xmxmw007147.html', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', 'https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-2.jpg', 'https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-3.jpg'] } },
+                { top: '55%', left: '72%', product: { name: 'Lắc tay Vàng Trắng 33,3% (8K) Đính đá ECZ STYLE By PNJ', price: '4.367.000đ', link: 'https://www.pnj.com.vn/site/san-pham/lac-tay-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-xmxmw000942.html', images: ['https://cdn.pnj.io/images/detailed/287/on-glxmxmw000942-lac-tay-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', 'https://cdn.pnj.io/images/detailed/287/on-glxmxmw000942-lac-tay-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-2.jpg', 'https://cdn.pnj.io/images/detailed/287/on-glxmxmw000942-lac-tay-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-3.jpg'] } }
+            ];
+
+            // Dữ liệu hotspot riêng cho ảnh p1_nmicdh.jpg
+            const p1Hotspots = [
+                { top: '40%', left: '18%', product: { name: 'Mặt Dây Chuyền', price: '1.200.000đ', images: mockImages } },
+                { top: '40%', right: '18%', product: { name: 'Bông Tai Kim Cương', price: '850.000đ', images: mockImages } },
+                { bottom: '32%', left: '48%', product: { name: 'Nhẫn Cưới Trái Tim', price: '2.400.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] } },
+                { bottom: '23%', left: '16%', product: { name: 'Nhẫn Kim Cương', price: '1.800.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] } },
+                { bottom: '23%', right: '16%', product: { name: 'Nhẫn Đính Hôn', price: '2.100.000đ', images: ['https://cdn.pnj.io/images/detailed/287/on-gnxmxmw007147-nhan-vang-trang-33-3-8k-dinh-da-ecz-style-by-pnj-1.jpg', ...mockImages.slice(1)] } }
+            ];
+
+            // Setup banner linh động cho từng tab
+            const mainBanners = {
+                'TƯƠI TRẺ TẠO XU HƯỚNG': { image: 'https://res.cloudinary.com/dzkiwoek4/image/upload/v1774940542/photo_2026-03-31_14-02-14_vr719l.jpg', hotspots: defaultHotspots },
+                'SANG TRỌNG ĐỊNH PHONG THÁI': { image: 'https://res.cloudinary.com/drdkxe3mw/image/upload/v1774594555/p1_nmicdh.jpg', hotspots: p1Hotspots },
+                'ĐẲNG CẤP NGỜI KHÍ CHẤT': { image: 'https://res.cloudinary.com/dzkiwoek4/image/upload/v1774940542/photo_2026-03-31_14-02-14_vr719l.jpg', hotspots: defaultHotspots },
+                'TRANG SỨC ƯU ĐÃI': { image: 'https://res.cloudinary.com/dzkiwoek4/image/upload/v1774940542/photo_2026-03-31_14-02-14_vr719l.jpg', hotspots: defaultHotspots }
+            };
+
             const activeProduct = ref(null);
             const formData = ref({ name: '', phone: '', agreed: false });
 
+            // Hàm xử lý đổi tab
             const changeBranch = (branch) => {
                 activeBranch.value = branch;
                 activeProduct.value = null;
-                // Thêm tự động lướt lên đầu trang khi bấm đổi menu tab
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 nextTick(() => lucide.createIcons());
             };
 
+            // Hàm mở/đóng popup
             const openPopup = (product) => {
                 activeProduct.value = product;
                 nextTick(() => lucide.createIcons());
             };
-
             const closePopup = () => activeProduct.value = null;
 
+            // Hàm xử lý submit form
             const handleForm = () => {
-                alert(`Cảm ơn! Chúng tôi đã nhận được thông tin.`);
+                alert(`Cảm ơn ${formData.value.name}! Chúng tôi đã nhận được thông tin. Mã ưu đãi sẽ được gửi đến số ${formData.value.phone}.`);
                 formData.value = { name: '', phone: '', agreed: false };
             };
 
             onMounted(() => lucide.createIcons());
 
             return { 
-                activeBranch, branches, branchLabels, layoutMap, heroVideos,
+                activeBranch, branches, branchTitles, pageTitles, layoutMap, heroVideos, horizontalVideos, subBannerVideos, mainBanners,
                 mockImages, activeProduct, formData, 
                 changeBranch, openPopup, closePopup, handleForm 
             };
